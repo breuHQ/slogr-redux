@@ -1,0 +1,59 @@
+name: sentinel-cli
+args:
+  - verbose:
+      help: Sets the verbosity level
+      long: verbose
+      short: v
+      multiple: true
+
+subcommands:
+  - register:
+      about: Registers sentinel with mothership
+      args:
+        - url:
+            help: Mothership URL
+            long: url
+            short: u
+            default_value: http://localhost:8000
+        - id:
+            help: Sentinel ID
+            long: id
+            short: i
+  - serve:
+      about: Starts the sentinel as a server
+      args:
+        - mode:
+            help: Mode to run in
+            long: mode
+            short: m
+            possible_values:
+              - standalone # quick run without mothership
+              - daemon  # with all the bells and whistles
+            default_value: standalone
+  - session:
+      about: Manages sentinel sessions in standalone mode
+      subcommands:
+        - create:
+            about: Creates a new session
+            args:
+              - destination:
+                  help: Destination IP of the session
+                  long: destination
+                  short: d
+              - packet_count:
+                  help: Number of packets to send
+                  long: count
+                  short: c
+                  default_value: "1"
+              - packet_size:
+                  help: Size of each packet to send in bytes
+                  long: size
+                  short: s
+                  default_value: "256"
+                  takes_value: true
+              - interval:
+                  help: Interval between packets in milliseconds
+                  long: interval
+                  short: i
+                  default_value: "0"
+                  takes_value: true

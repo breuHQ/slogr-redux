@@ -1,0 +1,16 @@
+[package]
+name = "sentinel"
+description = "Command line interface for the slogr.io sentinel"
+version = "0.0.1-dev"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = {version = "2.33.3", features=["yaml"]}
+tokio = {version = "1.12.0", features = ["full"]}
+tracing = {version = "0.1.29", default-features = false, features = ["attributes"]}
+tracing-subscriber = "0.2.25"
+
+# cli related dependencies
+twamp = { path = "../protocols/twamp"}

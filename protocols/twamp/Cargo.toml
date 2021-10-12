@@ -1,0 +1,14 @@
+[package]
+name = "twamp"
+description = "RFC 5357, Two Way Active Measurement Protocol Implementation"
+version = "0.0.1-dev"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bytes = "1.1.0"
+tokio = {version = "1.12.0", features = ["full"]}
+tokio-stream = "0.1.7"
+tracing = {version = "0.1.29", default-features = false, features = ["attributes"]}
+tracing-subscriber = "0.2.25"
