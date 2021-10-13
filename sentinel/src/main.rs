@@ -20,16 +20,14 @@ async fn main() {
     .about(ABOUT)
     .get_matches();
 
-  // match matches.occurrences_of("v") {
-  //   0 => println!("Verbose mode is off"),
-  //   1 => println!("Verbose mode is kind of on"),
-  //   2 => println!("Verbose mode is on"),
-  //   _ => println!("Don't be crazy"),
-  // }
+  match matches.occurrences_of("v") {
+    0 => println!("Verbose mode is off"),
+    1 => println!("Verbose mode is kind of on"),
+    2 => println!("Verbose mode is on"),
+    _ => println!("Don't be crazy"),
+  }
 
   commands::serve().await;
-
-  
 }
 
 fn trace_init() {

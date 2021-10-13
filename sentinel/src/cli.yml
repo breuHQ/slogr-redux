@@ -7,6 +7,50 @@ args:
       multiple: true
 
 subcommands:
+  - config:
+      about: Configure the sentinel
+      long: config
+      short: c
+      subcommands:
+        - set:
+            about: Set a configuration value
+            long: set
+            short: s
+            args:
+              - key:
+                  help: The configuration key
+                  long: key
+                  short: k
+                  required: true
+              - value:
+                  help: The configuration value
+                  long: value
+                  short: v
+                  required: true
+        - get:
+            about: Get a configuration value
+            long: get
+            short: g
+            args:
+              - key:
+                  help: The configuration key
+                  long: key
+                  short: k
+                  required: true
+        - list:
+            about: List all configuration values
+            long: list
+            short: l
+        - delete:
+            about: Delete a configuration value
+            long: delete
+            short: d
+            args:
+              - key:
+                  help: The configuration key
+                  long: key
+                  short: k
+                  required: true
   - register:
       about: Registers sentinel with mothership
       args:

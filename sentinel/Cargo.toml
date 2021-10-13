@@ -9,6 +9,8 @@ edition = "2018"
 [dependencies]
 clap = {version = "2.33.3", features=["yaml"]}
 tokio = {version = "1.12.0", features = ["full"]}
+tokio-stream = "0.1.7"
+tokio-util = {version = "0.6.8", features = ["full"]}
 tracing = {version = "0.1.29", default-features = false, features = ["attributes"]}
 tracing-subscriber = "0.2.25"
 
