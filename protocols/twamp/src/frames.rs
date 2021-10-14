@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use serde_big_array::BigArray;
+use tokio::{io::BufWriter, net::TcpStream};
 
 /// Represents a TWAMP frame.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -7,6 +8,12 @@ pub enum Frame {
   ServerGreeting(ServerGreetingFrame),
   SetUpResponse(SetUpResponseFrame),
   ServerStart(ServerStartFrame),
+}
+
+impl Frame {
+  pub fn write(&self, mut stream: BufWriter<TcpStream>) {
+
+  }
 }
 
 ///   The server greeting frame required for connection handshake.
