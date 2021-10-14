@@ -1,4 +1,8 @@
+use serde::{Deserialize, Serialize};
+use serde_big_array::BigArray;
+
 /// Represents a TWAMP frame.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum Frame {
   ServerGreeting(ServerGreetingFrame),
   SetUpResponse(SetUpResponseFrame),
@@ -46,6 +50,8 @@ pub enum Frame {
 ///
 /// Count MUST be a power of 2.  Count MUST be at least 1024.  Count
 /// SHOULD be increased as more computing power becomes common.
+#[repr(packed)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct ServerGreetingFrame {
   pub unused: [u8; 12],
   pub mode: ServerGreetingModeValue,
@@ -175,11 +181,26 @@ impl ServerGreetingFrame {
 /// cryptographically secure pseudo-random number source:  if this is
 /// done, the first repetition is unlikely to occur before 2^64 sessions
 /// with the same secret key are conducted).
+#[repr(packed)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct SetUpResponseFrame {
   pub mode: ServerGreetingModeValue,
+  #[serde(with = "BigArray")]
   pub key_id: [u8; 80],
+  #[serde(with = "BigArray")]
   pub token: [u8; 64],
   pub client_iv: [u8; 16],
+}
+
+impl SetUpResponseFrame {
+  pub fn mode_unauthenticated () -> Self {
+    Self {
+      mode: ServerGreetingModeValue::Unauthenticated,
+      key_id: [0; 80],
+      token: [0; 64],
+      client_iv: [0; 16],
+    }
+  }
 }
 
 /// Meaningful Server Greeting Mode Values
@@ -203,6 +224,8 @@ pub struct SetUpResponseFrame {
 /// SHOULD close the connection if it receives a greeting with Modes
 /// equal to zero.  The client MAY close the connection if the client's
 /// desired mode is unavailable.
+#[repr(u32)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum ServerGreetingModeValue {
   Unavailable = 0,
   Unauthenticated = 1,
@@ -263,6 +286,8 @@ pub enum ServerGreetingModeValue {
 ///  instantiation of the server SHOULD report the same exact Start-Time
 ///  value to each client in each session.
 ///  The previous transactions constitute connection setup.
+#[repr(packed)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct ServerStartFrame {
   pub mbz1: [u8; 15],
   pub accept: ServerStartAcceptValue,
@@ -289,6 +314,8 @@ pub struct ServerStartFrame {
 ///  message receiver MUST interpret all values of Accept other than these
 ///  reserved values as 1.  This way, other values are available for
 ///  future extensions.
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum ServerStartAcceptValue {
   Ok = 0,
   Failure = 1,

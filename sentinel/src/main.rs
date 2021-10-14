@@ -4,15 +4,18 @@ mod commands;
 use clap::{load_yaml, App};
 use tracing::{info, Level};
 use tracing_subscriber::FmtSubscriber;
+use tokio::runtime::Runtime;
+
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
 const ABOUT: &str = env!("CARGO_PKG_DESCRIPTION");
 
-#[tokio::main]
-async fn main() {
+fn main() {
   trace_init();
-  info!("Starting cli");
+  info!("[slogr.io]: Starting Sentinel ....");
+
+  let runtime = Runtime::new().unwrap();
 
   let yaml = load_yaml!("cli.yml");
   let matches = App::from_yaml(yaml)
@@ -28,7 +31,13 @@ async fn main() {
     _ => println!("Don't be crazy"),
   }
 
-  commands::serve().await;
+  runtime.block_on(async {
+    twamp::io::server::Server::run().await;
+  });
+
+  // tokio::task::spawn_blocking(|| {
+  //     twamp::io::server::Server::run();
+  // }).await.unwrap();
 }
 
 fn trace_init() {
