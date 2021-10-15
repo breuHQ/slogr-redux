@@ -1,8 +1,9 @@
 use criterion::{ criterion_group, criterion_main, Criterion};
+use twamp::io::server::Server;
 mod commands;
 
 fn criterion_benchmark(c: &mut Criterion) {
-    c.bench_function("Sentinel Serve", |b| b.iter(|| commands::serve()));
+    c.bench_function("Sentinel Serve", |b| b.iter(|| Server::start()));
 }
 
 criterion_group!(benches, criterion_benchmark);

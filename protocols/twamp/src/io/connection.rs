@@ -1,10 +1,13 @@
-use std::net::SocketAddr;
+use std::{net::SocketAddr};
 
 use bytes::BytesMut;
 use tokio::{
-  io::{AsyncReadExt, AsyncWriteExt, BufWriter},
+  io::{AsyncWriteExt, BufWriter},
   net::TcpStream,
 };
+use tracing::{debug, info};
+
+use crate::{errors::RfcError, frames::{ServerGreetingFrame, ServerGreetingMode}};
 
 #[derive(Debug)]
 pub struct Connection {
@@ -16,6 +19,7 @@ pub struct Connection {
 
 impl Connection {
   pub fn new(stream: TcpStream, addr: SocketAddr) -> Self {
+    info!("Established connection for: {:?}", addr);
     let stream = BufWriter::new(stream);
     let buffer = BytesMut::with_capacity(4 * 1024 * 1024); // TODO: Determine this value. Currently 4MB.
     let cursor: usize = 0;
@@ -28,68 +32,98 @@ impl Connection {
     }
   }
 
-  pub async fn send_server_greeting(&self) -> Result<Self, std::io::Error> {
-    // let stream = self.stream.clone();
+  /// Sends a server greeting frame from the server 
+  pub async fn send_server_greeting(mut self) -> Result<Self, std::io::Error> {
+    let server_greeting_mode = ServerGreetingMode::Unauthenticated; // TODO: Get this from global configuration.
+    let frame = ServerGreetingFrame::with_mode(server_greeting_mode);
+    info!("Server greeting mode: {:?}", frame.mode);
+    info!("Sending server greeting frame");
+    
+    debug!("ServerGreetingFrame [unused]: {:?}", frame.unused);
+    self.stream.write_all(&frame.unused).await?;
+    
+    debug!("ServerGreetingFrame [mode]: {:?}", (frame.mode as u32).to_be_bytes());
+    self.stream.write_all(&(frame.mode as u32).to_be_bytes()).await?;
+
+    debug!("ServerGreetingFrame [challenge]: {:?}", frame.challenge);
+    self.stream.write_all(&frame.challenge).await?;
+    
+    debug!("ServerGreetingFrame [salt]: {:?}", frame.salt);
+    self.stream.write_all(&frame.salt).await?;
+    
+    debug!("ServerGreetingFrame [count]: {:?}", (frame.count as u32).to_be_bytes());
+    self.stream.write_all(&(frame.count as u32).to_be_bytes()).await?;
+    
+    debug!("ServerGreetingFrame [mbz]: {:?}", frame.mbz);
+    self.stream.write_all(&frame.mbz).await?;
+    
+    self.stream.flush().await?;
+    info!("Finished sending server greeting frame");
+    
+    Ok(self)
+  }
+
+  /// Reads the server greeting frame from the server
+  pub async fn read_server_greeting(&self) -> Result<Self, RfcError> {
     todo!();
   }
 
-  pub fn read_server_greeting(&self) -> Result<Self, std::io::Error> {
+  /// Sends the setup response frame to the server.
+  pub async fn send_setup_response(&self) -> Result<Self, RfcError> {
     todo!();
   }
 
-  pub fn send_setup_response(&self) -> Result<Self, std::io::Error> {
+  /// Reads the setup response frame from the client.
+  pub async fn read_setup_response(&self) -> Result<Self, RfcError> {
     todo!();
   }
 
-  pub fn read_setup_response(&self) -> Result<Self, std::io::Error> {
+  /// 
+  pub async fn send_server_start(&self) -> Result<Self, RfcError> {
     todo!();
   }
 
-  pub fn send_server_start(&self) -> Result<Self, std::io::Error> {
+  pub fn read_server_start(&self) -> Result<Self, RfcError> {
     todo!();
   }
 
-  pub fn read_server_start(&self) -> Result<Self, std::io::Error> {
+  pub fn send_request_session(&self) -> Result<Self, RfcError> {
     todo!();
   }
 
-  pub fn send_request_session(&self) -> Result<Self, std::io::Error> {
+  pub fn read_request_session(&self) -> Result<Self, RfcError> {
     todo!();
   }
 
-  pub fn read_request_session(&self) -> Result<Self, std::io::Error> {
+  pub fn send_accept_session(&self) -> Result<Self, RfcError> {
     todo!();
   }
 
-  pub fn send_accept_session(&self) -> Result<Self, std::io::Error> {
+  pub fn receive_accept_session(&self) -> Result<Self, RfcError> {
     todo!();
   }
 
-  pub fn receive_accept_session(&self) -> Result<Self, std::io::Error> {
+  pub fn send_start_session() -> Result<Self, RfcError> {
     todo!();
   }
 
-  pub fn send_start_session() -> Result<Self, std::io::Error> {
+  pub fn receive_start_session() -> Result<Self, RfcError> {
     todo!();
   }
 
-  pub fn receive_start_session() -> Result<Self, std::io::Error> {
+  pub fn send_start_ack() -> Result<Self, RfcError> {
     todo!();
   }
 
-  pub fn send_start_ack() -> Result<Self, std::io::Error> {
+  pub fn receive_start_ack() -> Result<Self, RfcError> {
     todo!();
   }
 
-  pub fn receive_start_ack() -> Result<Self, std::io::Error> {
+  pub fn send_stop_sessions() -> Result<Self, RfcError> {
     todo!();
   }
 
-  pub fn send_stop_sessions() -> Result<Self, std::io::Error> {
-    todo!();
-  }
-
-  pub fn receive_stop_sessions() -> Result<Self, std::io::Error> {
+  pub fn receive_stop_sessions() -> Result<Self, RfcError> {
     todo!();
   }
 }

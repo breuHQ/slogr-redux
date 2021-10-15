@@ -11,7 +11,7 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
 const ABOUT: &str = env!("CARGO_PKG_DESCRIPTION");
 
-fn main() {
+fn main()  {
   trace_init();
   info!("[slogr.io]: Starting Sentinel ....");
 
@@ -32,12 +32,8 @@ fn main() {
   }
 
   runtime.block_on(async {
-    twamp::io::server::Server::run().await;
+    twamp::io::server::Server::start().await.unwrap();
   });
-
-  // tokio::task::spawn_blocking(|| {
-  //     twamp::io::server::Server::run();
-  // }).await.unwrap();
 }
 
 fn trace_init() {

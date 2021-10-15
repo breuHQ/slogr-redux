@@ -1,15 +1,7 @@
-use bytes::BytesMut;
-use std::net::SocketAddr;
-use tokio::{
-  io::{AsyncReadExt, AsyncWriteExt, BufWriter},
-  net::{TcpListener, TcpStream},
-};
+use tokio::net::TcpListener;
 use tracing::debug;
 
-use crate::{
-  frames::{Frame, ServerGreetingFrame},
-  io::connection::Connection,
-};
+use crate::io::connection::Connection;
 
 /// Defines the server as per the RFC definition.
 #[derive(Debug)]
@@ -19,101 +11,24 @@ pub struct Server {
 
 /// Represents a single connection to the server.
 impl Server {
-  pub async fn run(&self) {
-    let listener = TcpListener::bind("0.0.0.0:9000")
-      .await
-      // .map_err(|_| TwampError::PortUnavailable { port: "9000".to_string() })
-      .unwrap();
-
+  pub async fn start() -> Result<TcpListener, std::io::Error> {
+    let listener = TcpListener::bind("0.0.0.0:9000").await?;
+    // .expect(msg!("Failed to bind to port 9000"));
     debug!("Server started on port 9000");
 
     loop {
       let (stream, addr) = listener.accept().await.unwrap();
       let connection = Connection::new(stream, addr);
-      let result = self.handle_connection(connection).await;
-      // let (rx, tx) = stream.split();
-      // debug!("New Connection: {}", addr);
-
-      // let frame = Frame::ServerGreeting(ServerGreetingFrame::mode_unauthenticated());
-      // let encoded = bincode::serialize(&frame).unwrap();
-      // debug!("Encoded Frame: {:?}", encoded);
-      // debug!("Encoded Frame Length: {}", encoded.len());
-
-      // match frame {
-      //   Frame::ServerGreeting(frame) => {
-      //     debug!("Server Greeting Frame");
-      //     // let mut buffer = BytesMut::with_capacity(4 * 1024);
-      //     // frame.encode(&mut buffer);
-      //     // stream.write_all(&buffer).await.unwrap();
-      //   }
-      //   Frame::SetUpResponse(_) => todo!(),
-      //   Frame::ServerStart(_) => todo!(),
-      // }
-
-      // // Each connection spawns a new thread
-      // tokio::spawn(async move {
-      //   let mut framed = BytesCodec::new().framed(stream);
-
-      //   // We loop while there are messages coming from the Stream `framed`.
-      //   // The stream will return None once the client disconnects.
-      //   while let Some(message) = framed.next().await {
-      //     match message {
-      //       Ok(bytes) => debug!("bytes: {:?}", bytes),
-      //       Err(err) => debug!("Socket closed with error: {:?}", err),
-      //     }
-      //   }
-
-      //   println!("Socket received FIN packet and closed connection");
-      // });
+      Server::handle_connection(connection).await?;
     }
-
-    // move the socket into a seperate parent thread.
-    // this thread will be responsible to keep the server up and spawn a new process for each incoming connection
-    // tokio::spawn(async move {
-    //   debug!("Server thread started");
-    // });
-
-    // Ok(server)
   }
 
-  async fn handle_connection(&self, mut connection: Connection) {
-    tokio::spawn(async move {
-      let result = connection.send_server_greeting().await.unwrap();
-      let frame = Frame::ServerGreeting(ServerGreetingFrame::mode_unauthenticated());
-      match frame {
-        Frame::ServerGreeting(frame) => {
-          debug!("ServerGreetingFrame: {:?}", frame);
-          debug!("ServerGreetingFrame [unused]: {:?}", frame.unused);
-          // connection.stream.write_all(b"!").await.unwrap();
-          connection.stream.write_all(&frame.unused).await.unwrap();
-          debug!("ServerGreetingFrame [mode]: {:?}", (frame.mode as u32).to_be_bytes());
-          connection
-            .stream
-            .write_all(&(frame.mode as u32).to_be_bytes())
-            .await
-            .unwrap();
-          debug!("ServerGreetingFrame [challenge]: {:?}", frame.challenge);
-          connection.stream.write_all(&frame.challenge).await.unwrap();
-          debug!("ServerGreetingFrame [salt]: {:?}", frame.salt);
-          connection.stream.write_all(&frame.salt).await.unwrap();
-          debug!("ServerGreetingFrame [count]: {:?}", (frame.count as u32).to_be_bytes());
-          connection
-            .stream
-            .write_all(&(frame.count as u32).to_be_bytes())
-            .await
-            .unwrap();
-          debug!("ServerGreetingFrame [mbz]: {:?}", frame.mbz);
-          connection.stream.write_all(&frame.mbz).await.unwrap();
-          // connection.stream.write_all(b"\n").await.unwrap();
-          connection.stream.flush().await.unwrap();
-          debug!("ServerGreetingFrame: Finished writing");
-        }
-        _ => {}
-      }
-      loop {
-        let n = connection.stream.read_buf(&mut connection.buffer).await.unwrap();
-        debug!("Read {} bytes from {}", n, connection.addr);
-      };
+  async fn handle_connection(connection: Connection) -> Result<(), std::io::Error> {
+    let result = tokio::spawn(async move {
+      connection.send_server_greeting().await?;
+      // connection.read_setup_response().await?;
+      Ok(())
     });
+    result.await?
   }
 }

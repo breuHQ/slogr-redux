@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 use serde_big_array::BigArray;
-use tokio::{io::BufWriter, net::TcpStream};
 
 /// Represents a TWAMP frame.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -62,7 +61,7 @@ impl Frame {
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct ServerGreetingFrame {
   pub unused: [u8; 12],
-  pub mode: ServerGreetingModeValue,
+  pub mode: ServerGreetingMode,
   pub challenge: [u8; 16],
   pub salt: [u8; 16],
   pub count: u32,
@@ -70,10 +69,21 @@ pub struct ServerGreetingFrame {
 }
 
 impl ServerGreetingFrame {
+  pub fn with_mode(mode: ServerGreetingMode) -> Self {
+    Self {
+      unused: [0; 12],
+      mode,
+      challenge: [0; 16],
+      salt: [0; 16],
+      count: 1024,
+      mbz: [0; 12],
+    }
+  }
+
   pub fn mode_unavailable() -> Self {
     Self {
       unused: [0; 12],
-      mode: ServerGreetingModeValue::Unavailable,
+      mode: ServerGreetingMode::Unavailable,
       challenge: [0; 16],
       salt: [0; 16],
       count: 1024,
@@ -84,7 +94,7 @@ impl ServerGreetingFrame {
   pub fn mode_unauthenticated() -> Self {
     Self {
       unused: [0; 12],
-      mode: ServerGreetingModeValue::Unauthenticated,
+      mode: ServerGreetingMode::Unauthenticated,
       challenge: [0; 16],
       salt: [0; 16],
       count: 1024,
@@ -95,7 +105,7 @@ impl ServerGreetingFrame {
   pub fn mode_authenticated() -> Self {
     Self {
       unused: [0; 12],
-      mode: ServerGreetingModeValue::Authenticated,
+      mode: ServerGreetingMode::Authenticated,
       challenge: [0; 16],
       salt: [0; 16],
       count: 1024,
@@ -106,7 +116,7 @@ impl ServerGreetingFrame {
   pub fn mode_encrypted() -> Self {
     Self {
       unused: [0; 12],
-      mode: ServerGreetingModeValue::Encrypted,
+      mode: ServerGreetingMode::Encrypted,
       challenge: [0; 16],
       salt: [0; 16],
       count: 1024,
@@ -192,7 +202,7 @@ impl ServerGreetingFrame {
 #[repr(packed)]
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct SetUpResponseFrame {
-  pub mode: ServerGreetingModeValue,
+  pub mode: ServerGreetingMode,
   #[serde(with = "BigArray")]
   pub key_id: [u8; 80],
   #[serde(with = "BigArray")]
@@ -201,9 +211,9 @@ pub struct SetUpResponseFrame {
 }
 
 impl SetUpResponseFrame {
-  pub fn mode_unauthenticated () -> Self {
+  pub fn mode_unauthenticated() -> Self {
     Self {
-      mode: ServerGreetingModeValue::Unauthenticated,
+      mode: ServerGreetingMode::Unauthenticated,
       key_id: [0; 80],
       token: [0; 64],
       client_iv: [0; 16],
@@ -234,7 +244,7 @@ impl SetUpResponseFrame {
 /// desired mode is unavailable.
 #[repr(u32)]
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub enum ServerGreetingModeValue {
+pub enum ServerGreetingMode {
   Unavailable = 0,
   Unauthenticated = 1,
   Authenticated = 2,
@@ -298,7 +308,7 @@ pub enum ServerGreetingModeValue {
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct ServerStartFrame {
   pub mbz1: [u8; 15],
-  pub accept: ServerStartAcceptValue,
+  pub accept: ServerStartAccept,
   pub server_iv: [u8; 16],
   pub mbz2: [u8; 8],
 }
@@ -324,7 +334,7 @@ pub struct ServerStartFrame {
 ///  future extensions.
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub enum ServerStartAcceptValue {
+pub enum ServerStartAccept {
   Ok = 0,
   Failure = 1,
   InternalError = 2,
