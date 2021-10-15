@@ -3,5 +3,10 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum TwampError {
   #[error("Port already in use: {port:?}")]
-  PortUnavailable {port: String},
+  PortUnavailable { 
+    port: String
+   },
+
+  #[error(transparent)]
+  IOError(#[from] std::io::Error),
 }

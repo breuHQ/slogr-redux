@@ -11,8 +11,9 @@ pub enum Frame {
 }
 
 impl Frame {
-  pub fn write(&self, mut stream: BufWriter<TcpStream>) {
-
+  /// Checks if the provided byte stream is a valid TWAMP frame.
+  pub fn is_valid(&self) -> Result<Self, std::io::Error> {
+    todo!();
   }
 }
 

@@ -6,7 +6,10 @@ use tokio::{
 };
 use tracing::debug;
 
-use crate::frames::{Frame, ServerGreetingFrame};
+use crate::{
+  frames::{Frame, ServerGreetingFrame},
+  io::connection::Connection,
+};
 
 /// Defines the server as per the RFC definition.
 #[derive(Debug)]
@@ -15,34 +18,8 @@ pub struct Server {
 }
 
 /// Represents a single connection to the server.
-#[derive(Debug)]
-pub struct Connection {
-  stream: BufWriter<TcpStream>,
-  addr: SocketAddr,
-  buffer: BytesMut,
-  cursor: usize,
-}
-
-impl Connection {
-  pub fn new(stream: TcpStream, addr: SocketAddr) -> Self {
-    let stream = BufWriter::new(stream);
-    let buffer = BytesMut::with_capacity(4 * 1024 * 1024); // TODO: Determine this value. Currently 4MB.
-    let cursor: usize = 0;
-
-    Self {
-      stream,
-      addr,
-      buffer,
-      cursor,
-    }
-  }
-
-  pub fn read_frame(&mut self) {}
-  // pub fn write_frame() -> Result<(), TwampError> {}
-}
-
 impl Server {
-  pub async fn run() {
+  pub async fn run(&self) {
     let listener = TcpListener::bind("0.0.0.0:9000")
       .await
       // .map_err(|_| TwampError::PortUnavailable { port: "9000".to_string() })
@@ -53,48 +30,7 @@ impl Server {
     loop {
       let (stream, addr) = listener.accept().await.unwrap();
       let connection = Connection::new(stream, addr);
-      debug!("Connection established with {}", addr);
-
-      tokio::spawn(async move {
-        let mut connection = connection;
-        let frame = Frame::ServerGreeting(ServerGreetingFrame::mode_unauthenticated());
-        match frame {
-          Frame::ServerGreeting(frame) => {
-            debug!("ServerGreetingFrame: {:?}", frame);
-            debug!("ServerGreetingFrame [unused]: {:?}", frame.unused);
-            connection.stream.write_all(b"!").await.unwrap();
-            connection.stream.write_all(&frame.unused).await.unwrap();
-            debug!("ServerGreetingFrame [mode]: {:?}", (frame.mode as u32).to_be_bytes());
-            connection
-              .stream
-              .write_all(&(frame.mode as u32).to_be_bytes())
-              .await
-              .unwrap();
-            debug!("ServerGreetingFrame [challenge]: {:?}", frame.challenge);
-            connection.stream.write_all(&frame.challenge).await.unwrap();
-            debug!("ServerGreetingFrame [salt]: {:?}", frame.salt);
-            connection.stream.write_all(&frame.salt).await.unwrap();
-            debug!("ServerGreetingFrame [count]: {:?}", (frame.count as u32).to_be_bytes());
-            connection
-              .stream
-              .write_all(&(frame.count as u32).to_be_bytes())
-              .await
-              .unwrap();
-            debug!("ServerGreetingFrame [mbz]: {:?}", frame.mbz);
-            connection.stream.write_all(&frame.mbz).await.unwrap();
-            connection.stream.write_all(b"\r\n").await.unwrap();
-            connection.stream.flush().await.unwrap();
-            debug!("ServerGreetingFrame: Finished writing");
-          }
-          _ => {}
-        }
-        loop {
-          let n = connection.stream.read_buf(&mut connection.buffer).await.unwrap();
-          debug!("Read {} bytes from {}", n, connection.addr);
-        }
-        // connection.read_frame();
-      });
-
+      let result = self.handle_connection(connection).await;
       // let (rx, tx) = stream.split();
       // debug!("New Connection: {}", addr);
 
@@ -138,5 +74,46 @@ impl Server {
     // });
 
     // Ok(server)
+  }
+
+  async fn handle_connection(&self, mut connection: Connection) {
+    tokio::spawn(async move {
+      let result = connection.send_server_greeting().await.unwrap();
+      let frame = Frame::ServerGreeting(ServerGreetingFrame::mode_unauthenticated());
+      match frame {
+        Frame::ServerGreeting(frame) => {
+          debug!("ServerGreetingFrame: {:?}", frame);
+          debug!("ServerGreetingFrame [unused]: {:?}", frame.unused);
+          // connection.stream.write_all(b"!").await.unwrap();
+          connection.stream.write_all(&frame.unused).await.unwrap();
+          debug!("ServerGreetingFrame [mode]: {:?}", (frame.mode as u32).to_be_bytes());
+          connection
+            .stream
+            .write_all(&(frame.mode as u32).to_be_bytes())
+            .await
+            .unwrap();
+          debug!("ServerGreetingFrame [challenge]: {:?}", frame.challenge);
+          connection.stream.write_all(&frame.challenge).await.unwrap();
+          debug!("ServerGreetingFrame [salt]: {:?}", frame.salt);
+          connection.stream.write_all(&frame.salt).await.unwrap();
+          debug!("ServerGreetingFrame [count]: {:?}", (frame.count as u32).to_be_bytes());
+          connection
+            .stream
+            .write_all(&(frame.count as u32).to_be_bytes())
+            .await
+            .unwrap();
+          debug!("ServerGreetingFrame [mbz]: {:?}", frame.mbz);
+          connection.stream.write_all(&frame.mbz).await.unwrap();
+          // connection.stream.write_all(b"\n").await.unwrap();
+          connection.stream.flush().await.unwrap();
+          debug!("ServerGreetingFrame: Finished writing");
+        }
+        _ => {}
+      }
+      loop {
+        let n = connection.stream.read_buf(&mut connection.buffer).await.unwrap();
+        debug!("Read {} bytes from {}", n, connection.addr);
+      };
+    });
   }
 }
