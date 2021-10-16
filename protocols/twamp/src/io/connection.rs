@@ -1,4 +1,4 @@
-use std::{net::SocketAddr, sync::Arc};
+use std::{net::SocketAddr};
 
 use bytes::BytesMut;
 use tokio::{
@@ -7,8 +7,11 @@ use tokio::{
 };
 use tracing::{debug, info};
 
-use crate::{errors::RfcError, frames::{ServerGreetingFrame, ServerGreetingMode, SetupResponseFrame}};
+use crate::{errors::TwampError, frames::{ServerGreetingFrame, ServerGreetingMode, SetupResponseFrame}};
 
+/// Represents a connection to the underlying stream.
+/// Depending on the role of the connection i.e. the server, control client, session sender or session reflector, we
+/// instantiate our connection.
 #[derive(Debug)]
 pub struct Connection {
   pub stream: BufWriter<TcpStream>,
@@ -35,7 +38,7 @@ impl Connection {
     }
   }
 
-  /// Sends a server greeting frame from the server 
+  /// Sends a server greeting frame from the server
   pub async fn send_server_greeting(&mut self) -> Result<(), std::io::Error> {
     let frame = ServerGreetingFrame::with_mode(self.mode);
 
@@ -67,7 +70,7 @@ impl Connection {
   }
 
   /// Reads the server greeting frame from the server
-  pub async fn read_server_greeting(&self) -> Result<Self, RfcError> {
+  pub async fn read_server_greeting(&self) -> Result<Self, TwampError> {
     todo!();
   }
 
@@ -96,56 +99,55 @@ impl Connection {
   }
 
   /// Reads the setup response frame from the client.
-  pub async fn read_setup_response(&self) -> Result<Self, RfcError> {
+  pub async fn read_setup_response(&self) -> Result<Self, TwampError> {
     todo!();
   }
 
-  /// 
-  pub async fn send_server_start(&self) -> Result<Self, RfcError> {
+  pub async fn send_server_start(&self) -> Result<Self, TwampError> {
     todo!();
   }
 
-  pub fn read_server_start(&self) -> Result<Self, RfcError> {
+  pub fn read_server_start(&self) -> Result<Self, TwampError> {
     todo!();
   }
 
-  pub fn send_request_session(&self) -> Result<Self, RfcError> {
+  pub fn send_request_session(&self) -> Result<Self, TwampError> {
     todo!();
   }
 
-  pub fn read_request_session(&self) -> Result<Self, RfcError> {
+  pub fn read_request_session(&self) -> Result<Self, TwampError> {
     todo!();
   }
 
-  pub fn send_accept_session(&self) -> Result<Self, RfcError> {
+  pub fn send_accept_session(&self) -> Result<Self, TwampError> {
     todo!();
   }
 
-  pub fn receive_accept_session(&self) -> Result<Self, RfcError> {
+  pub fn receive_accept_session(&self) -> Result<Self, TwampError> {
     todo!();
   }
 
-  pub fn send_start_session() -> Result<Self, RfcError> {
+  pub fn send_start_session() -> Result<Self, TwampError> {
     todo!();
   }
 
-  pub fn receive_start_session() -> Result<Self, RfcError> {
+  pub fn receive_start_session() -> Result<Self, TwampError> {
     todo!();
   }
 
-  pub fn send_start_ack() -> Result<Self, RfcError> {
+  pub fn send_start_ack() -> Result<Self, TwampError> {
     todo!();
   }
 
-  pub fn receive_start_ack() -> Result<Self, RfcError> {
+  pub fn receive_start_ack() -> Result<Self, TwampError> {
     todo!();
   }
 
-  pub fn send_stop_sessions() -> Result<Self, RfcError> {
+  pub fn send_stop_sessions() -> Result<Self, TwampError> {
     todo!();
   }
 
-  pub fn receive_stop_sessions() -> Result<Self, RfcError> {
+  pub fn receive_stop_sessions() -> Result<Self, TwampError> {
     todo!();
   }
 }

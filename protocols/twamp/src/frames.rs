@@ -14,6 +14,10 @@ impl Frame {
   pub fn is_valid(&self) -> Result<Self, std::io::Error> {
     todo!();
   }
+
+  pub fn parse(&self) -> Result<Self, std::io::Error> {
+    todo!();
+  }
 }
 
 ///   The server greeting frame required for connection handshake.

@@ -32,7 +32,7 @@ fn main()  {
   }
 
   runtime.block_on(async {
-    twamp::io::server::Server::start().await.unwrap();
+    twamp::io::server::Server::run().await.unwrap();
   });
 }
 

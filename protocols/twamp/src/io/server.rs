@@ -1,17 +1,22 @@
+use std::net::SocketAddr;
+
 use tokio::net::TcpListener;
 use tracing::debug;
 
-use crate::{errors::RfcError, io::connection::Connection};
+use crate::{io::connection::Connection};
 
 /// Defines the server as per the RFC definition.
 #[derive(Debug)]
 pub struct Server {
+  addr: SocketAddr,
   listener: TcpListener,
 }
 
 /// Represents a single connection to the server.
 impl Server {
-  pub async fn start() -> Result<TcpListener, std::io::Error> {
+
+  // Starts a new server.
+  pub async fn run() -> Result<TcpListener, std::io::Error> {
     let listener = TcpListener::bind("0.0.0.0:9000").await?;
     // .expect(msg!("Failed to bind to port 9000"));
     debug!("Server started on port 9000");
