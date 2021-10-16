@@ -72,7 +72,7 @@ impl Connection {
   }
 
   /// Sends the setup response frame to the server.
-  pub async fn send_setup_response(mut self) -> Result<Self, std::io::Error> {
+  pub async fn send_setup_response(&mut self) -> Result<(), std::io::Error> {
     let frame = SetupResponseFrame::with_mode(self.mode);
     
     info!("Sending setup response frame");
@@ -92,7 +92,7 @@ impl Connection {
     self.stream.flush().await?;
     info!("Finished sending setup response frame");
     
-    Ok(self)
+    Ok(())
   }
 
   /// Reads the setup response frame from the client.
