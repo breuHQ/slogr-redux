@@ -5,7 +5,7 @@ use serde_big_array::BigArray;
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum Frame {
   ServerGreeting(ServerGreetingFrame),
-  SetUpResponse(SetUpResponseFrame),
+  SetUpResponse(SetupResponseFrame),
   ServerStart(ServerStartFrame),
 }
 
@@ -125,7 +125,7 @@ impl ServerGreetingFrame {
   }
 }
 
-/// The server MUST respond with the following Set-Up-Response message:
+/// The client MUST respond with the following Set-Up-Response message:
 ///
 /// ```text
 ///    0                   1                   2                   3
@@ -201,7 +201,7 @@ impl ServerGreetingFrame {
 /// with the same secret key are conducted).
 #[repr(packed)]
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct SetUpResponseFrame {
+pub struct SetupResponseFrame {
   pub mode: ServerGreetingMode,
   #[serde(with = "BigArray")]
   pub key_id: [u8; 80],
@@ -210,13 +210,18 @@ pub struct SetUpResponseFrame {
   pub client_iv: [u8; 16],
 }
 
-impl SetUpResponseFrame {
-  pub fn mode_unauthenticated() -> Self {
-    Self {
-      mode: ServerGreetingMode::Unauthenticated,
-      key_id: [0; 80],
-      token: [0; 64],
-      client_iv: [0; 16],
+impl SetupResponseFrame {
+  pub fn with_mode(mode: ServerGreetingMode) -> Self {
+    match mode {
+      ServerGreetingMode::Authenticated => todo!(),
+      ServerGreetingMode::Unauthenticated => Self {
+        mode,
+        key_id: [0; 80],
+        token: [0; 64],
+        client_iv: [0; 16],
+      },
+      ServerGreetingMode::Unavailable => todo!(),
+      ServerGreetingMode::Encrypted => todo!(),
     }
   }
 }

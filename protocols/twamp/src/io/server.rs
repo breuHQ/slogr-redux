@@ -1,7 +1,7 @@
 use tokio::net::TcpListener;
 use tracing::debug;
 
-use crate::io::connection::Connection;
+use crate::{errors::RfcError, io::connection::Connection};
 
 /// Defines the server as per the RFC definition.
 #[derive(Debug)]
@@ -19,13 +19,15 @@ impl Server {
     loop {
       let (stream, addr) = listener.accept().await.unwrap();
       let connection = Connection::new(stream, addr);
-      Server::handle_connection(connection).await?;
+      Server::handle(connection).await?;
     }
   }
 
-  async fn handle_connection(connection: Connection) -> Result<(), std::io::Error> {
+  /// handles the connection
+  async fn handle(mut connection: Connection) -> Result<(), std::io::Error> {
     let result = tokio::spawn(async move {
       connection.send_server_greeting().await?;
+      connection.send_setup_response().await?;
       // connection.read_setup_response().await?;
       Ok(())
     });
