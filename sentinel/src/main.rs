@@ -1,17 +1,15 @@
 mod commands;
 
-
 use clap::{load_yaml, App};
-use tracing::{info, Level};
-use tracing_subscriber::FmtSubscriber;
 use tokio::runtime::Runtime;
-
+use tracing::{debug, info, Level};
+use tracing_subscriber::FmtSubscriber;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
 const ABOUT: &str = env!("CARGO_PKG_DESCRIPTION");
 
-fn main()  {
+fn main() {
   trace_init();
   info!("[slogr.io]: Starting Sentinel ....");
 
@@ -24,16 +22,14 @@ fn main()  {
     .about(ABOUT)
     .get_matches();
 
-  match matches.occurrences_of("v") {
-    0 => println!("Verbose mode is off"),
-    1 => println!("Verbose mode is kind of on"),
-    2 => println!("Verbose mode is on"),
-    _ => println!("Don't be crazy"),
+  match matches.subcommand() {
+    ("config", options) => debug!("config: {:?}", options),
+    ("serve", options) => debug!("serve: {:?}", options),
+    ("mode", options) => debug!("mode: {:?}", options),
+    _ => unreachable!(),
   }
 
-  runtime.block_on(async {
-    twamp::io::server::Server::run().await.unwrap();
-  });
+  runtime.block_on(async { twamp::io::server::Server::run().await.unwrap() });
 }
 
 fn trace_init() {

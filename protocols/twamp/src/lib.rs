@@ -1,10 +1,10 @@
 //! # TWAMP Library for Slogr
-//! 
-//! The library is an implementation of RFC 5357, Two way active measurement 
+//!
+//! The library is an implementation of RFC 5357, Two way active measurement
 //! protocol. The code organization is based on the RFC's logical model.
-//! 
+//!
 //! ## Relationship of Test and Control Protocols
-//! 
+//!
 //! OWAMP actually consists of two inter-related protocols: OWAMP-Control
 //! and OWAMP-Test.  OWAMP-Control is used to initiate, start, and stop
 //! test sessions and to fetch their results, whereas OWAMP-Test is used
@@ -26,8 +26,8 @@
 //! negotiation of sender and receiver addresses and port numbers,
 //! session start time, session length, test packet size, the mean
 //! Poisson sampling interval for the test stream, and some attributes of
-//! the very general [RFC 2330](https://datatracker.ietf.org/doc/html/rfc2330) 
-//! notion of packet type, including packet size and per-hop behavior (PHB) 
+//! the very general [RFC 2330](https://datatracker.ietf.org/doc/html/rfc2330)
+//! notion of packet type, including packet size and per-hop behavior (PHB)
 //! [RFC2474](https://datatracker.ietf.org/doc/html/rfc2474), which could be used to
 //! support the measurement of one-way network characteristics across
 //! differentiated services networks.  Additionally, OWAMP-Control
@@ -42,35 +42,35 @@
 //! deployments within private corporate networks.  If integration with
 //! Simple Network Management Protocol (SNMP) or proprietary network
 //! management protocols is required, gateways may be created.
-//! 
+//!
 //! ## Logical Model
-//! 
+//!
 //! Several roles are logically separated to allow for broad flexibility
 //! in use.  Specifically, we define the following:
-//! 
+//!
 //! ### Session-Sender
 //! The sending endpoint of an OWAMP-Test session;
-//! 
+//!
 //! ###Session-Receiver
 //! The receiving endpoint of an OWAMP-Test session;
-//! 
+//!
 //! ### Server
 //! An end system that manages one or more OWAMP-Test
 //! sessions, is capable of configuring per-session
 //! state in session endpoints, and is capable of
 //! returning the results of a test session;
-//! 
+//!
 //! ### Control-Client   
 //! An end system that initiates requests for
 //! OWAMP-Test sessions, triggers the start of a set
 //! of sessions, and may trigger their termination;
-//! 
+//!
 //! ### Fetch-Client
-//! An end system that initiates requests to fetch the results of 
+//! An end system that initiates requests to fetch the results of
 //! completed OWAMP-Test sessions.
-//! 
+//!
 //! ## Flow Diagram
-//! 
+//!
 //! ```text
 //!        +----------------+               +------------------+
 //!        | Session-Sender |--OWAMP-Test-->| Session-Receiver |
@@ -91,7 +91,7 @@
 //!        | Control-Client |     |   Fetch-Client  |
 //!        +----------------+     +-----------------+
 //! ```
-//! 
+//!
 //! (Unlabeled links in the figure are unspecified by this document and
 //! may be proprietary protocols.)
 //! Different logical roles can be played by the same host.  For example,
@@ -99,7 +99,7 @@
 //! playing the roles of Control-Client, Fetch-Client, and Session-
 //! Sender, and the other playing the roles of Server and Session-
 //! Receiver.  This is shown below.
-//! 
+//!
 //! ```text
 //!        +-----------------+                   +------------------+
 //!        | Control-Client  |<--OWAMP-Control-->| Server           |
@@ -107,7 +107,7 @@
 //!        | Session-Sender  |---OWAMP-Test----->| Session-Receiver |
 //!        +-----------------+                   +------------------+
 //! ```
-//! 
+//!
 //! Finally, because many Internet paths include segments that transport
 //! IP over ATM, delay and loss measurements can include the effects of
 //! ATM segmentation and reassembly (SAR).  Consequently, OWAMP has been

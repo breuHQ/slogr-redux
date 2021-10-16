@@ -3,7 +3,7 @@ use std::net::SocketAddr;
 use tokio::net::TcpListener;
 use tracing::debug;
 
-use crate::{io::connection::Connection};
+use crate::io::connection::Connection;
 
 /// Defines the server as per the RFC definition.
 #[derive(Debug)]
@@ -14,7 +14,6 @@ pub struct Server {
 
 /// Represents a single connection to the server.
 impl Server {
-
   // Starts a new server.
   pub async fn run() -> Result<TcpListener, std::io::Error> {
     let listener = TcpListener::bind("0.0.0.0:9000").await?;

@@ -1,4 +1,4 @@
-use std::{net::SocketAddr};
+use std::net::SocketAddr;
 
 use bytes::BytesMut;
 use tokio::{
@@ -7,7 +7,10 @@ use tokio::{
 };
 use tracing::{debug, info};
 
-use crate::{errors::TwampError, frames::{ServerGreetingFrame, ServerGreetingMode, SetupResponseFrame}};
+use crate::{
+  errors::TwampError,
+  frames::{ServerGreetingFrame, ServerGreetingMode, SetupResponseFrame},
+};
 
 /// Represents a connection to the underlying stream.
 /// Depending on the role of the connection i.e. the server, control client, session sender or session reflector, we
@@ -44,25 +47,25 @@ impl Connection {
 
     info!("Server greeting mode: {:?}", self.mode);
     info!("Sending server greeting frame");
-    
+
     debug!("ServerGreetingFrame [unused]: {:?}", frame.unused);
     self.stream.write_all(&frame.unused).await?;
-    
+
     debug!("ServerGreetingFrame [mode]: {:?}", (frame.mode as u32).to_be_bytes());
     self.stream.write_all(&(self.mode as u32).to_be_bytes()).await?;
 
     debug!("ServerGreetingFrame [challenge]: {:?}", frame.challenge);
     self.stream.write_all(&frame.challenge).await?;
-    
+
     debug!("ServerGreetingFrame [salt]: {:?}", frame.salt);
     self.stream.write_all(&frame.salt).await?;
-    
+
     debug!("ServerGreetingFrame [count]: {:?}", (frame.count as u32).to_be_bytes());
     self.stream.write_all(&(frame.count as u32).to_be_bytes()).await?;
-    
+
     debug!("ServerGreetingFrame [mbz]: {:?}", frame.mbz);
     self.stream.write_all(&frame.mbz).await?;
-    
+
     self.stream.flush().await?;
     info!("Finished sending server greeting frame");
 
@@ -77,7 +80,7 @@ impl Connection {
   /// Sends the setup response frame to the server.
   pub async fn send_setup_response(&mut self) -> Result<(), std::io::Error> {
     let frame = SetupResponseFrame::with_mode(self.mode);
-    
+
     info!("Sending setup response frame");
 
     debug!("SetupResponseFrame [mode]: {:?}", self.mode);
@@ -94,7 +97,7 @@ impl Connection {
 
     self.stream.flush().await?;
     info!("Finished sending setup response frame");
-    
+
     Ok(())
   }
 
