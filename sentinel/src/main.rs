@@ -24,12 +24,12 @@ fn main() {
 
   match matches.subcommand() {
     ("config", options) => debug!("config: {:?}", options),
-    ("serve", options) => debug!("serve: {:?}", options),
-    ("mode", options) => debug!("mode: {:?}", options),
-    _ => unreachable!(),
+    ("serve", options) => commands::serve(runtime, options),
+    ("client", options) => debug!("client: {:?}", options),
+    _ => debug!("No option selected"),
   }
 
-  runtime.block_on(async { twamp::io::server::Server::run().await.unwrap() });
+  // runtime.block_on(async { twamp::io::server::Server::run().await.unwrap() });
 }
 
 fn trace_init() {

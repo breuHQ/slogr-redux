@@ -72,12 +72,12 @@ subcommands:
             short: m
             possible_values:
               - standalone # quick run without mothership
-              - daemon  # with all the bells and whistles
+              - full  # with all the bells and whistles
             default_value: standalone
-  - session:
-      about: Manages sentinel sessions in standalone mode
+  - client:
+      about: Create a new test client and runs in standalone mode
       subcommands:
-        - create:
+        - standalone:
             about: Creates a new session
             args:
               - destination:

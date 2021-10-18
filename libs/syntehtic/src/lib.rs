@@ -1,4 +1,4 @@
-//! # TWAMP Library for Slogr
+//! # Library to measure synthetic traffic. Based on RFC 5357.
 //!
 //! The library is an implementation of RFC 5357, Two way active measurement
 //! protocol. The code organization is based on the RFC's logical model.

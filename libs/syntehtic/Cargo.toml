@@ -1,6 +1,6 @@
 [package]
-name = "twamp"
-description = "RFC 5357, Two Way Active Measurement Protocol Implementation"
+name = "synthetic"
+description = "Library to measure synthetic traffic."
 version = "0.0.1-dev"
 edition = "2018"
 

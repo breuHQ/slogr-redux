@@ -7,10 +7,7 @@ use tokio::{
 };
 use tracing::{debug, info};
 
-use crate::{
-  errors::TwampError,
-  frames::{ServerGreetingFrame, ServerGreetingMode, SetupResponseFrame},
-};
+use crate::{errors::TwampError, frames::{Frame, ServerGreetingFrame, ServerGreetingMode, SetupResponseFrame}};
 
 /// Represents a connection to the underlying stream.
 /// Depending on the role of the connection i.e. the server, control client, session sender or session reflector, we
@@ -39,6 +36,14 @@ impl Connection {
       cursor,
       mode,
     }
+  }
+
+  pub async fn read_frame(&mut self) -> Result<Frame, std::io::Error> {
+    todo!();
+  }
+
+  pub async fn write_frame(&mut self, mut frame: Frame) {
+    todo!();
   }
 
   /// Sends a server greeting frame from the server
@@ -92,7 +97,7 @@ impl Connection {
     debug!("SetupResponseFrame [token]: {:?}", frame.token);
     self.stream.write_all(&frame.token).await?;
 
-    debug!("SetupResponseFrame []: {:?}", frame.client_iv);
+    debug!("SetupResponseFrame [client_iv]: {:?}", frame.client_iv);
     self.stream.write_all(&frame.client_iv).await?;
 
     self.stream.flush().await?;

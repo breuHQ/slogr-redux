@@ -1,5 +1,5 @@
 [workspace]
 members = [
     "sentinel",
-    "protocols/*",
+    "libs/*",
 ]

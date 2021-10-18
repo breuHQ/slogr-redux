@@ -1,6 +1,8 @@
 use std::net::SocketAddr;
 
 use tokio::net::TcpListener;
+use tokio_stream::StreamExt;
+use tokio_util::codec::{BytesCodec, Decoder};
 use tracing::debug;
 
 use crate::io::connection::Connection;
@@ -32,8 +34,23 @@ impl Server {
     let result = tokio::spawn(async move {
       connection.send_server_greeting().await?;
       connection.send_setup_response().await?;
-      // connection.read_setup_response().await?;
+
+      let mut framed = BytesCodec::new().framed(connection.stream);
+      while let Some(message) = framed.next().await {
+        match message {
+          Ok(bytes) => println!("bytes: {:?}", bytes),
+          Err(err) => println!("Socket closed with error: {:?}", err),
+        }
+      }
       Ok(())
+      // loop {
+      //   let _frame = connection.read_frame().await?;
+      //   match _frame {
+      //     Frame::SetUpResponse(_) => todo!(), // TODO: only match all the possible frames we can get then process accordingly.
+      //     Frame::ServerStart(_) => todo!(),
+      //     _ => todo!(), // TODO: replace with raising error
+      //   }
+      // }
     });
     result.await?
   }
