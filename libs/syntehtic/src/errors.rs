@@ -1,7 +1,9 @@
 use thiserror::Error;
 
+
+/// An interface to define errors accross the entire library
 #[derive(Debug, Error)]
-pub enum TwampError {
+pub enum SyntheticError {
   #[error("Port already in use: {port:?}")]
   PortUnavailable { port: String },
 
@@ -10,6 +12,9 @@ pub enum TwampError {
     request_mode: String,
     available_modes: Vec<String>,
   },
+  
+  #[error("Invalid or empty frame")]
+  InvalidOrEmptyFrame,
 
   #[error(transparent)]
   IOError(#[from] std::io::Error),

@@ -7,7 +7,7 @@ use tokio::{
 };
 use tracing::{debug, info};
 
-use crate::{errors::TwampError, frames::{Frame, ServerGreetingFrame, ServerGreetingMode, SetupResponseFrame}};
+use crate::{errors::SyntheticError, frames::{Frame, ServerGreetingFrame, ServerGreetingMode, SetupResponseFrame}};
 
 /// Represents a connection to the underlying stream.
 /// Depending on the role of the connection i.e. the server, control client, session sender or session reflector, we
@@ -78,7 +78,7 @@ impl Connection {
   }
 
   /// Reads the server greeting frame from the server
-  pub async fn read_server_greeting(&self) -> Result<Self, TwampError> {
+  pub async fn read_server_greeting(&self) -> Result<Self, SyntheticError> {
     todo!();
   }
 
@@ -107,55 +107,55 @@ impl Connection {
   }
 
   /// Reads the setup response frame from the client.
-  pub async fn read_setup_response(&self) -> Result<Self, TwampError> {
+  pub async fn read_setup_response(&self) -> Result<Self, SyntheticError> {
     todo!();
   }
 
-  pub async fn send_server_start(&self) -> Result<Self, TwampError> {
+  pub async fn send_server_start(&self) -> Result<Self, SyntheticError> {
     todo!();
   }
 
-  pub fn read_server_start(&self) -> Result<Self, TwampError> {
+  pub fn read_server_start(&self) -> Result<Self, SyntheticError> {
     todo!();
   }
 
-  pub fn send_request_session(&self) -> Result<Self, TwampError> {
+  pub fn send_request_session(&self) -> Result<Self, SyntheticError> {
     todo!();
   }
 
-  pub fn read_request_session(&self) -> Result<Self, TwampError> {
+  pub fn read_request_session(&self) -> Result<Self, SyntheticError> {
     todo!();
   }
 
-  pub fn send_accept_session(&self) -> Result<Self, TwampError> {
+  pub fn send_accept_session(&self) -> Result<Self, SyntheticError> {
     todo!();
   }
 
-  pub fn receive_accept_session(&self) -> Result<Self, TwampError> {
+  pub fn receive_accept_session(&self) -> Result<Self, SyntheticError> {
     todo!();
   }
 
-  pub fn send_start_session() -> Result<Self, TwampError> {
+  pub fn send_start_session() -> Result<Self, SyntheticError> {
     todo!();
   }
 
-  pub fn receive_start_session() -> Result<Self, TwampError> {
+  pub fn receive_start_session() -> Result<Self, SyntheticError> {
     todo!();
   }
 
-  pub fn send_start_ack() -> Result<Self, TwampError> {
+  pub fn send_start_ack() -> Result<Self, SyntheticError> {
     todo!();
   }
 
-  pub fn receive_start_ack() -> Result<Self, TwampError> {
+  pub fn receive_start_ack() -> Result<Self, SyntheticError> {
     todo!();
   }
 
-  pub fn send_stop_sessions() -> Result<Self, TwampError> {
+  pub fn send_stop_sessions() -> Result<Self, SyntheticError> {
     todo!();
   }
 
-  pub fn receive_stop_sessions() -> Result<Self, TwampError> {
+  pub fn receive_stop_sessions() -> Result<Self, SyntheticError> {
     todo!();
   }
 }

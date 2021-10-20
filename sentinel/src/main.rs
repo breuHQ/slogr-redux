@@ -10,7 +10,7 @@ const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
 const ABOUT: &str = env!("CARGO_PKG_DESCRIPTION");
 
 fn main() {
-  trace_init();
+  prelude();
   info!("[slogr.io]: Starting Sentinel ....");
 
   let runtime = Runtime::new().unwrap();
@@ -25,14 +25,18 @@ fn main() {
   match matches.subcommand() {
     ("config", options) => debug!("config: {:?}", options),
     ("serve", options) => commands::serve(runtime, options),
-    ("client", options) => debug!("client: {:?}", options),
-    _ => debug!("No option selected"),
+    ("client", options) => commands::client(runtime, options),
+    _ => info!("[slogr.io] Failed to start. No option selected."),
   }
 
   // runtime.block_on(async { twamp::io::server::Server::run().await.unwrap() });
 }
 
-fn trace_init() {
+/// Sets up the environment and do necessary actions before starting up the action
+/// 
+/// TODO: we need to add configuration setup. The plan to have one global config singleton object, and subsequent calls
+/// to them will reference that global object.
+fn prelude() {
   let subscriber = FmtSubscriber::builder().with_max_level(Level::TRACE).finish();
   tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
 }

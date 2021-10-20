@@ -114,5 +114,8 @@
 //! designed to allow for small test packets that would fit inside the
 //! payload of a single ATM cell (this is only achieved in unauthenticated mode).
 pub mod errors;
+#[warn(missing_debug_implementations, missing_docs)]
 pub mod frames;
+
+#[warn(missing_debug_implementations, missing_docs)]
 pub mod io;

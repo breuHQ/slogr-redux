@@ -16,7 +16,7 @@ pub struct Server {
 
 /// Represents a single connection to the server.
 impl Server {
-  // Starts a new server.
+  /// Starts a new server.
   pub async fn run() -> Result<TcpListener, std::io::Error> {
     let listener = TcpListener::bind("0.0.0.0:9000").await?;
     // .expect(msg!("Failed to bind to port 9000"));
@@ -39,7 +39,7 @@ impl Server {
       while let Some(message) = framed.next().await {
         match message {
           Ok(bytes) => println!("bytes: {:?}", bytes),
-          Err(err) => println!("Socket closed with error: {:?}", err),
+          Err(err) => eprintln!("Socket closed with error: {:?}", err),
         }
       }
       Ok(())
