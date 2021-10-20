@@ -14,14 +14,18 @@ use crate::{errors::SyntheticError, frames::{Frame, ServerGreetingFrame, ServerG
 /// instantiate our connection.
 #[derive(Debug)]
 pub struct Connection {
+  /// underlying tcp stream wrapped inside a buffer for writing
   pub stream: BufWriter<TcpStream>,
+  /// the remote address for the connection
   pub addr: SocketAddr,
+  /// buffer for writing to the socket
   pub buffer: BytesMut,
-  pub cursor: usize,
+  /// the mode the server is connected on
   pub mode: ServerGreetingMode,
 }
 
 impl Connection {
+  /// creates a new connection object
   pub fn new(stream: TcpStream, addr: SocketAddr) -> Self {
     info!("Established connection for: {:?}", addr);
     let stream = BufWriter::new(stream);
@@ -33,7 +37,6 @@ impl Connection {
       stream,
       addr,
       buffer,
-      cursor,
       mode,
     }
   }

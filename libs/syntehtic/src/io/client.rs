@@ -13,33 +13,21 @@ pub struct Client {
 }
 
 impl Client {
-  /// picks the connection from either outpost, or default.
-  // pub async fn connect() -> Result<(), std::io::Error> {
-  //   let addr = "127.0.0.1:9000".parse::<SocketAddr>().unwrap();
-  //   let stream = TcpStream::connect(addr).await?;
-  //   let mut framed = BytesCodec::new().framed(stream);
-  //   while let Some(message) = framed.next().await {
-  //     match message {
-  //       Ok(bytes) => debug!("bytes: {:?}", bytes),
-  //       // Err(err) => error!("Socket closed with error: {:?}", err),
-  //       Err(err) => error!("Parse Error: {:?}", err),
-  //     }
-  //   }
-
-  //   Ok(())
-  // }
-
+  /// connect to a given address
   pub async fn connect() -> Result<(), SyntheticError> {
     let addr = "127.0.0.1:9000".parse::<SocketAddr>().unwrap();
     let stream = TcpStream::connect(addr).await?;
-    while let Some(frame) = BytesCodec::new().framed(stream).next().await {
+    let mut framed = BytesCodec::new().framed(stream);
+    while let Some(frame) = framed.next().await {
       match frame {
-        Ok(_) => { return Ok(()); },
+        Ok(frame) => {
+          println!("bytes [{:?}] {:?}", frame.len(), frame); 
+          // return Ok(()); 
+        },
         Err(e) => { return Err(SyntheticError::IOError(e)); }
       }
     }
+    debug!("Do I reach here");
     Err(SyntheticError::InvalidOrEmptyFrame)
   }
-
-  pub async fn process(&self) {}
 }

@@ -1,21 +1,20 @@
 use serde::{Deserialize, Serialize};
 use serde_big_array::BigArray;
 
+use crate::errors::SyntheticError;
+
 /// Represents a TWAMP frame.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum Frame {
   ServerGreeting(ServerGreetingFrame),
   SetUpResponse(SetupResponseFrame),
   ServerStart(ServerStartFrame),
+  RequestSession(RequestSessionFrame),
 }
 
 impl Frame {
-  /// Checks if the provided byte stream is a valid TWAMP frame.
-  pub fn is_valid(&self) -> Result<Self, std::io::Error> {
-    todo!();
-  }
-
-  pub fn parse(&self) -> Result<Self, std::io::Error> {
+  /// Checks if the provided byte stream and returns the Frame
+  pub fn is_valid(&self) -> Result<Self, SyntheticError> {
     todo!();
   }
 }
