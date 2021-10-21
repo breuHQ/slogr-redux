@@ -15,7 +15,7 @@ tracing = {version = "0.1.29", default-features = false, features = ["attributes
 tracing-subscriber = "0.2.25"
 criterion = "0.3"
 
-# cli related dependencies
+# sentinel related dependencies
 synthetic = { path = "../libs/syntehtic" }
 
 

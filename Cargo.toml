@@ -2,4 +2,5 @@
 members = [
     "sentinel",
     "libs/*",
+    "macros/*"
 ]

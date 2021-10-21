@@ -1,5 +1,6 @@
 use std::net::SocketAddr;
 
+use bincode::Options;
 use bytes::BytesMut;
 use tokio::{
   io::{AsyncWriteExt, BufWriter},
@@ -47,13 +48,20 @@ impl Connection {
     todo!();
   }
 
-  pub async fn write_frame(&mut self, mut frame: Frame) {
+  pub async fn write_frame(&mut self, _frame: Frame) {
     todo!();
   }
 
   /// Sends a server greeting frame from the server
   pub async fn send_server_greeting(&mut self) -> Result<(), std::io::Error> {
     let frame = ServerGreetingFrame::with_mode(self.mode);
+
+    let options = bincode::DefaultOptions::new().with_fixint_encoding();
+    let encoded = options.serialize(&frame).unwrap();
+    debug!("in bytes: {:?}", encoded);
+    debug!("length: {:?}", encoded.len());
+    let decoded: ServerGreetingFrame = options.deserialize(&encoded[..]).unwrap();
+    debug!("struct: {:?}", decoded);
 
     info!("Server greeting mode: {:?}", self.mode);
     info!("Sending server greeting frame");

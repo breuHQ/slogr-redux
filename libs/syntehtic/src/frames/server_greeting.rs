@@ -59,6 +59,18 @@ pub struct ServerGreetingFrame {
   pub mbz: [u8; 12],
 }
 
+impl Into<Vec<u8>> for ServerGreetingFrame {
+  fn into(self) -> Vec<u8> {
+    todo!()
+  }
+}
+
+impl From<Vec<u8>> for ServerGreetingFrame {
+    fn from(_: Vec<u8>) -> Self {
+        todo!()
+    }
+}
+
 impl ServerGreetingFrame {
   /// give a mode, generates a server greeting frame
   pub fn with_mode(mode: ServerGreetingMode) -> Self {
