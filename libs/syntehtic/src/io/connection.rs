@@ -7,7 +7,10 @@ use tokio::{
 };
 use tracing::{debug, info};
 
-use crate::{errors::SyntheticError, frames::{Frame, ServerGreetingFrame, ServerGreetingMode, SetupResponseFrame}};
+use crate::{
+  errors::SyntheticError,
+  frames::{Frame, ServerGreetingFrame, ServerGreetingMode, SetupResponseFrame},
+};
 
 /// Represents a connection to the underlying stream.
 /// Depending on the role of the connection i.e. the server, control client, session sender or session reflector, we
@@ -30,7 +33,6 @@ impl Connection {
     info!("Established connection for: {:?}", addr);
     let stream = BufWriter::new(stream);
     let buffer = BytesMut::with_capacity(4 * 1024 * 1024); // TODO: Determine this value. Currently 4MB.
-    let cursor: usize = 0;
     let mode = ServerGreetingMode::Unauthenticated; // TODO: Get this from global configuration.
 
     Self {

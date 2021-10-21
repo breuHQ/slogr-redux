@@ -33,7 +33,7 @@ fn main() {
 }
 
 /// Sets up the environment and do necessary actions before starting up the action
-/// 
+///
 /// TODO: we need to add configuration setup. The plan to have one global config singleton object, and subsequent calls
 /// to them will reference that global object.
 fn prelude() {

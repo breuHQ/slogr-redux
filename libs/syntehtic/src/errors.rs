@@ -1,5 +1,5 @@
+//! Defines errors across all crate
 use thiserror::Error;
-
 
 /// An interface to define errors accross the entire library
 #[derive(Debug, Error)]
@@ -12,7 +12,7 @@ pub enum SyntheticError {
     request_mode: String,
     available_modes: Vec<String>,
   },
-  
+
   #[error("Invalid or empty frame")]
   InvalidOrEmptyFrame,
 

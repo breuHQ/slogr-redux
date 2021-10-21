@@ -1,10 +1,9 @@
-use std::{io::Error, net::SocketAddr};
+use std::net::SocketAddr;
 
-use bytes::BytesMut;
 use tokio::net::TcpStream;
 use tokio_stream::StreamExt;
 use tokio_util::codec::{BytesCodec, Decoder};
-use tracing::{debug, error};
+use tracing::debug;
 
 use crate::{errors::SyntheticError, io::connection::Connection};
 
@@ -21,10 +20,12 @@ impl Client {
     while let Some(frame) = framed.next().await {
       match frame {
         Ok(frame) => {
-          println!("bytes [{:?}] {:?}", frame.len(), frame); 
-          // return Ok(()); 
-        },
-        Err(e) => { return Err(SyntheticError::IOError(e)); }
+          println!("bytes [{:?}] {:?}", frame.len(), frame);
+          // return Ok(());
+        }
+        Err(e) => {
+          return Err(SyntheticError::IOError(e));
+        }
       }
     }
     debug!("Do I reach here");
