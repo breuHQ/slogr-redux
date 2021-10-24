@@ -7,7 +7,18 @@ edition = "2018"
 [lib]
 proc-macro = true
 
+[[test]]
+name = "tests"
+path = "tests/progress.rs"
+
+[[bin]]
+name = "view"
+path = "src/view.rs"
+
+[dev-dependencies]
+trybuild = { version = "1.0.49", features = ["diff"] }
+
 [dependencies]
 proc-macro2 = "1.0.30"
 quote = "1.0.10"
-syn = "1.0.80"
+syn = { version = "1.0.80", features = ["full", "derive", "extra-traits", "parsing"] }

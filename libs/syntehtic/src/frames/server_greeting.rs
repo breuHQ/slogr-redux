@@ -59,9 +59,19 @@ pub struct ServerGreetingFrame {
   pub mbz: [u8; 12],
 }
 
+
 impl Into<Vec<u8>> for ServerGreetingFrame {
   fn into(self) -> Vec<u8> {
-    todo!()
+    let mut bytes: Vec<u8> = vec![];
+    // let mode = (self.mode as u32).to_be_bytes().to_vec();
+    bytes.extend_from_slice(&self.unused);
+    bytes.extend_from_slice(&(self.mode as u32).to_be_bytes().to_vec());
+    bytes.extend_from_slice(&self.challenge);
+    bytes.extend_from_slice(&self.salt);
+    bytes.extend_from_slice(&self.count.to_be_bytes().to_vec());
+    bytes.extend_from_slice(&self.mbz);
+    bytes
+    // bytes
   }
 }
 

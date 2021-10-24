@@ -1,9 +1,10 @@
 mod commands;
 
-use clap::{load_yaml, App};
+use clap::{App, load_yaml};
 use tokio::runtime::Runtime;
 use tracing::{debug, info, Level};
 use tracing_subscriber::FmtSubscriber;
+use derive_bytes::ToBytes;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");

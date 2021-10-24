@@ -1,4 +1,4 @@
-use std::{net::SocketAddr};
+use std::net::SocketAddr;
 
 use bincode::Options;
 use tokio::net::TcpStream;
@@ -8,6 +8,7 @@ use tracing::debug;
 
 use crate::{errors::SyntheticError, io::connection::Connection};
 
+#[derive(Debug)]
 pub struct Client {
   pub connection: Connection,
 }
@@ -31,7 +32,7 @@ impl Client {
               // let decoded: ServerGreetingFrame = options.deserialize(&bytes[..]).unwrap();
               // debug!("decoded {:?}", decoded);
             }
-            _ => debug!("unknown length")
+            _ => debug!("unknown length"),
           }
           // return Ok(());
         }
