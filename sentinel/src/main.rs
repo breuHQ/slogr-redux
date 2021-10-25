@@ -4,7 +4,6 @@ use clap::{App, load_yaml};
 use tokio::runtime::Runtime;
 use tracing::{debug, info, Level};
 use tracing_subscriber::FmtSubscriber;
-use derive_bytes::ToBytes;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
@@ -12,7 +11,6 @@ const ABOUT: &str = env!("CARGO_PKG_DESCRIPTION");
 
 fn main() {
   prelude();
-  info!("[slogr.io]: Starting Sentinel ....");
 
   let runtime = Runtime::new().unwrap();
 
@@ -30,7 +28,7 @@ fn main() {
     _ => info!("[slogr.io] Failed to start. No option selected."),
   }
 
-  // runtime.block_on(async { twamp::io::server::Server::run().await.unwrap() });
+  // FIXME: Proper error handling and message in case of panic.
 }
 
 /// Sets up the environment and do necessary actions before starting up the action
