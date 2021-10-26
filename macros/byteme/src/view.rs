@@ -1,6 +1,6 @@
-use derive_bytes::ToBytes;
+use byteme::ByteMe;
 
-#[repr(u32)]
+#[derive(Copy, Clone)]
 pub enum ServerGreetingMode {
   Unavailable = 0,
   Unauthenticated = 1,
@@ -8,16 +8,16 @@ pub enum ServerGreetingMode {
   Encrypted = 4,
 }
 
-#[repr(packed)]
-#[derive(ToBytes)]
+#[derive(ByteMe)]
 pub struct ServerGreetingFrame {
   pub unused: [u8; 12],
 
-  // pub mode: ServerGreetingMode,
+  #[byte_me(u32)]
+  pub mode: ServerGreetingMode,
   pub challenge: [u8; 16],
 
   pub salt: [u8; 16],
-  pub count: u32,
+  pub count: u16,
   pub mbz: [u8; 12],
 }
 

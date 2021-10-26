@@ -17,7 +17,6 @@ criterion = "0.3"
 
 # sentinel related dependencies
 synthetic = { path = "../libs/syntehtic" }
-derive_bytes = { path = "../macros/derive_bytes"}
 
 
 
