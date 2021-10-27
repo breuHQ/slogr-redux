@@ -11,7 +11,7 @@ use tracing::{debug, info};
 
 use crate::{
   errors::SyntheticError,
-  frames::{Frame, ServerGreetingFrame, Mode, SetupResponseFrame},
+  frames::{ServerGreetingFrame, Mode, SetupResponseFrame},
 };
 
 /// Represents a connection to the underlying stream.

@@ -24,9 +24,9 @@ impl Server {
     debug!("Server started on port 9000");
 
     loop {
-      let (stream, addr) = listener.accept().await.unwrap();
+      let (stream, addr) = listener.accept().await?;
       let connection = Connection::new(stream, addr);
-      Server::handle(connection).await?;
+      tokio::spawn( Server::handle(connection));
     }
   }
 
