@@ -1,6 +1,7 @@
+//! Client side of the synthetic I/O.
+
 use std::net::SocketAddr;
 
-use bincode::Options;
 use tokio::net::TcpStream;
 use tokio_stream::StreamExt;
 use tokio_util::codec::{BytesCodec, Decoder};
@@ -8,8 +9,10 @@ use tracing::debug;
 
 use crate::{errors::SyntheticError, io::connection::Connection};
 
+/// Serves as a container for the client connection.
 #[derive(Debug)]
 pub struct Client {
+  /// Represents a tcp connection
   pub connection: Connection,
 }
 
@@ -25,10 +28,7 @@ impl Client {
           debug!("bytes [{:?}] {:?}", frame.len(), frame);
           match frame.len() {
             64 => {
-              let _options = bincode::DefaultOptions::new().with_big_endian();
-              debug!("appears to be server greeting frame");
               let bytes = frame.to_vec();
-              debug!("bytes: {:?}", bytes);
               // let decoded: ServerGreetingFrame = options.deserialize(&bytes[..]).unwrap();
               // debug!("decoded {:?}", decoded);
             }

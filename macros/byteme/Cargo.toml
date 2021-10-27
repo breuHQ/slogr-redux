@@ -1,7 +1,11 @@
 [package]
 name = "byteme"
-version = "0.1.0"
+description = "Converts a struct into byte array `[u8]` by reading the fields in the struct."
+version = "0.0.1-dev"
 edition = "2021"
+authors = [
+  "Yousuf Jawwad",
+]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]

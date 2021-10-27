@@ -1,6 +1,7 @@
+//! Connection to a remote peer
+
 use std::net::SocketAddr;
 
-use bincode::Options;
 use bytes::BytesMut;
 use tokio::{
   io::{AsyncWriteExt, BufWriter},
@@ -10,7 +11,7 @@ use tracing::{debug, info};
 
 use crate::{
   errors::SyntheticError,
-  frames::{Frame, ServerGreetingFrame, ServerGreetingMode, SetupResponseFrame},
+  frames::{Frame, ServerGreetingFrame, Mode, SetupResponseFrame},
 };
 
 /// Represents a connection to the underlying stream.
@@ -25,7 +26,7 @@ pub struct Connection {
   /// buffer for writing to the socket
   pub buffer: BytesMut,
   /// the mode the server is connected on
-  pub mode: ServerGreetingMode,
+  pub mode: Mode,
 }
 
 impl Connection {
@@ -34,7 +35,7 @@ impl Connection {
     info!("Established connection for: {:?}", addr);
     let stream = BufWriter::new(stream);
     let buffer = BytesMut::with_capacity(4 * 1024 * 1024); // TODO: Determine this value. Currently 4MB.
-    let mode = ServerGreetingMode::Unauthenticated; // TODO: Get this from global configuration.
+    let mode = Mode::Unauthenticated; // TODO: Get this from global configuration.
 
     Self {
       stream,
@@ -44,24 +45,9 @@ impl Connection {
     }
   }
 
-  pub async fn read_frame(&mut self) -> Result<Frame, std::io::Error> {
-    todo!();
-  }
-
-  pub async fn write_frame(&mut self, _frame: Frame) {
-    todo!();
-  }
-
   /// Sends a server greeting frame from the server
   pub async fn send_server_greeting(&mut self) -> Result<(), std::io::Error> {
     let frame = ServerGreetingFrame::with_mode(self.mode);
-
-    let options = bincode::DefaultOptions::new().with_fixint_encoding();
-    let encoded = options.serialize(&frame).unwrap();
-    debug!("in bytes: {:?}", encoded);
-    debug!("length: {:?}", encoded.len());
-    let decoded: ServerGreetingFrame = options.deserialize(&encoded[..]).unwrap();
-    debug!("struct: {:?}", decoded);
 
     info!("Server greeting mode: {:?}", self.mode);
     info!("Sending server greeting frame");

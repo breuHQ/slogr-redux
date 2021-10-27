@@ -1,3 +1,4 @@
+//! When our agent is serving as a server, we need to be able to send messages to the client.
 use std::net::SocketAddr;
 
 use tokio::net::TcpListener;
@@ -43,14 +44,6 @@ impl Server {
         }
       }
       Ok(())
-      // loop {
-      //   let _frame = connection.read_frame().await?;
-      //   match _frame {
-      //     Frame::SetUpResponse(_) => todo!(), // TODO: only match all the possible frames we can get then process accordingly.
-      //     Frame::ServerStart(_) => todo!(),
-      //     _ => todo!(), // TODO: replace with raising error
-      //   }
-      // }
     });
     result.await?
   }

@@ -1,8 +1,6 @@
-use serde::{Deserialize, Serialize};
 
 /// IP versions as byte
-#[repr(u8)]
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy)]
 pub enum IpVn {
   /// Represented ip version 4
   V4 = 4,

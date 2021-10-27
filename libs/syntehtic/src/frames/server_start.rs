@@ -1,5 +1,3 @@
-use serde::{Deserialize, Serialize};
-
 use super::Accept;
 /// The server MUST respond with the following Server-Start message:
 /// ```text
@@ -24,8 +22,7 @@ use super::Accept;
 ///    |                                                               |
 ///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 /// ```
-#[repr(packed)]
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy)]
 pub struct ServerStartFrame {
   /// The MBZ parts MUST be zero.  The client MUST ignore their value.  MBZ
   /// (MUST be zero) fields here and after have the same semantics: the

@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 /// desired mode is unavailable.
 #[repr(u32)]
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub enum ServerGreetingMode {
+pub enum Mode {
   /// 0: The server is not willing to accept any more sessions.
   Unavailable = 0,
   /// 1: The serve is available in unautheticated mode.

@@ -1,5 +1,3 @@
-use serde::{Deserialize, Serialize};
-
 /// The full set of valid Server-Start accept value as described in RFC.   
 ///
 /// Accept values are used throughout the TWAMP-Control protocol to
@@ -19,8 +17,7 @@ use serde::{Deserialize, Serialize};
 ///  message receiver MUST interpret all values of Accept other than these
 ///  reserved values as 1.  This way, other values are available for
 ///  future extensions.
-#[repr(u8)]
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy)]
 pub enum Accept {
   /// Ok
   Ok = 0,

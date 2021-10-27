@@ -1,5 +1,4 @@
 use super::IpVn;
-use serde::{Deserialize, Serialize};
 
 /// Test session creation follows the same procedure as defined in
 /// Section 3.5 of OWAMP [RFC4656].  The Request-TW-Session command is
@@ -80,8 +79,7 @@ use serde::{Deserialize, Serialize};
 ///    |                                                               |
 ///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 /// ```
-#[repr(packed)]
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy)]
 pub struct RequestSessionFrame {
   /// If a TWAMP Server receives an unexpected Command Number, it MUST
   /// respond with the Accept field set to 3 (meaning "Some aspect of

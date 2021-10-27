@@ -1,7 +1,4 @@
-use serde::{Deserialize, Serialize};
-use serde_big_array::BigArray;
-
-use super::ServerGreetingMode;
+use super::Mode;
 
 /// The client MUST respond with the following Set-Up-Response message:
 ///
@@ -30,8 +27,7 @@ use super::ServerGreetingMode;
 ///   |                                                               |
 ///   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 /// ```
-#[repr(packed)]
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy)]
 pub struct SetupResponseFrame {
   /// Here Mode is the mode that the client chooses to use during this
   /// TWAMP-Control session.  It will also be used for all TWAMP-Test
@@ -45,15 +41,13 @@ pub struct SetupResponseFrame {
   /// indicates that it will not continue with the session; in this case,
   /// the client and the server SHOULD close the TCP connection associated
   /// with the OWAMP-Control session.
-  pub mode: ServerGreetingMode,
-  #[serde(with = "BigArray")]
+  pub mode: Mode,
   /// In unauthenticated mode, KeyID, Token, and Client-IV are unused.
   /// Otherwise, KeyID is a UTF-8 string, up to 80 octets in length (if the
   /// string is shorter, it is padded with zero octets), that tells the
   /// server which shared secret the client wishes to use to authenticate
   /// or encrypt,
   pub key_id: [u8; 80],
-  #[serde(with = "BigArray")]
   /// while Token is the concatenation of a 16-octet challenge,
   /// a 16-octet AES Session-key used for encryption, and a 32-octet HMAC-
   /// SHA1 Session-key used for authentication.  The token itself is
@@ -89,17 +83,17 @@ pub struct SetupResponseFrame {
 impl SetupResponseFrame {
   /// Given the [`ServerGreetingMode`], We generate the setup response.
   /// TODO: complete for all cases
-  pub fn with_mode(mode: ServerGreetingMode) -> Self {
+  pub fn with_mode(mode: Mode) -> Self {
     match mode {
-      ServerGreetingMode::Authenticated => todo!(),
-      ServerGreetingMode::Unauthenticated => Self {
+      Mode::Authenticated => todo!(),
+      Mode::Unauthenticated => Self {
         mode,
         key_id: [0; 80],
         token: [0; 64],
         client_iv: [0; 16],
       },
-      ServerGreetingMode::Unavailable => todo!(),
-      ServerGreetingMode::Encrypted => todo!(),
+      Mode::Unavailable => todo!(),
+      Mode::Encrypted => todo!(),
     }
   }
 }
