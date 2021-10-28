@@ -2,7 +2,6 @@
 
 use std::net::SocketAddr;
 
-use bytes::BytesMut;
 use tokio::{
   io::{AsyncWriteExt, BufWriter},
   net::TcpStream,
@@ -23,8 +22,6 @@ pub struct Connection {
   pub stream: BufWriter<TcpStream>,
   /// the remote address for the connection
   pub addr: SocketAddr,
-  /// buffer for writing to the socket
-  pub buffer: BytesMut,
   /// the mode the server is connected on
   pub mode: Mode,
 }
@@ -34,13 +31,11 @@ impl Connection {
   pub fn new(stream: TcpStream, addr: SocketAddr) -> Self {
     info!("Established connection for: {:?}", addr);
     let stream = BufWriter::new(stream);
-    let buffer = BytesMut::with_capacity(4 * 1024 * 1024); // TODO: Determine this value. Currently 4MB.
     let mode = Mode::Unauthenticated; // TODO: Get this from global configuration.
 
     Self {
       stream,
       addr,
-      buffer,
       mode,
     }
   }

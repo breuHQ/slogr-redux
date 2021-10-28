@@ -22,7 +22,6 @@ impl Client {
     let addr = "127.0.0.1:9000".parse::<SocketAddr>().unwrap();
     let stream = TcpStream::connect(addr).await?;
     let mut framed = BytesCodec::new().framed(stream);
-    let (rx, tx) = framed.split();
     while let Some(frame) = framed.next().await {
       match frame {
         Ok(frame) => {
