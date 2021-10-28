@@ -45,6 +45,6 @@ impl Client {
       }
     }
     debug!("Do I reach here");
-    Err(SyntheticError::InvalidOrEmptyFrame)
+    Err(SyntheticError::InvalidFrame)
   }
 }
