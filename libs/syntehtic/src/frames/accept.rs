@@ -1,3 +1,5 @@
+use num_derive::FromPrimitive;
+
 /// The full set of valid Server-Start accept value as described in RFC.   
 ///
 /// Accept values are used throughout the TWAMP-Control protocol to
@@ -17,7 +19,7 @@
 ///  message receiver MUST interpret all values of Accept other than these
 ///  reserved values as 1.  This way, other values are available for
 ///  future extensions.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, FromPrimitive)]
 pub enum Accept {
   /// Ok
   Ok = 0,

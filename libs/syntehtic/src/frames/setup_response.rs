@@ -1,4 +1,6 @@
 use super::Mode;
+use num_traits::FromPrimitive;
+use byteme::ByteMe;
 
 /// The client MUST respond with the following Set-Up-Response message:
 ///
@@ -27,7 +29,7 @@ use super::Mode;
 ///   |                                                               |
 ///   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 /// ```
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, ByteMe)]
 pub struct SetupResponseFrame {
   /// Here Mode is the mode that the client chooses to use during this
   /// TWAMP-Control session.  It will also be used for all TWAMP-Test
@@ -41,6 +43,7 @@ pub struct SetupResponseFrame {
   /// indicates that it will not continue with the session; in this case,
   /// the client and the server SHOULD close the TCP connection associated
   /// with the OWAMP-Control session.
+  #[byte_me(u32)]
   pub mode: Mode,
   /// In unauthenticated mode, KeyID, Token, and Client-IV are unused.
   /// Otherwise, KeyID is a UTF-8 string, up to 80 octets in length (if the

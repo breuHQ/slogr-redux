@@ -1,44 +1,42 @@
+//! Quickly generate `to_bytes()` and `from_bytes` methods on a struct to for easy data conversions.
+//!
+//! We have made the following assumptions about the fields of the struct:
+//!
+//! - The fields are public.
+//! - The fields will have the following types
+//!   - `u8`
+//!   - `u16`
+//!   - `u32`
+//!   - `u64`
+//!   - `u128`
+//!   - `usize`
+//!   - array of `u8`
+//!   - an enum
+//! - For enum, we must attach a `#[byte_me($size)]` attribute, where size is any of the positive integer types.
+//! - The enum declration must `#[derive(FromPrimitive)]` from the `num-derive` crate.
+
 use quote::ToTokens;
 
 /// Quickly generate `to_bytes()` and `from_bytes` methods on a struct to for easy data conversions.
-///
-/// We have made the following assumptions about the fields of the struct:
-///
-/// - The fields are public.
-/// - The fields will have the following types
-///   - `u8`
-///   - `u16`
-///   - `u32`
-///   - `u64`
-///   - `u128`
-///   - `usize`
-///   - array of `u8`
-///   - an enum
-/// - For enum, we must attach a `#[byte_me($size)]` attribute, where size is any of the positive integer types.
-/// - The enum declration must `#[derive(FromPrimitive)]` from the `num-derive` crate.
 #[proc_macro_derive(ByteMe, attributes(byte_me))]
 pub fn derive(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
-  let strukt_tokens = tokens.clone();
-  let strukt = syn::parse_macro_input!(strukt_tokens as ByteMeStruct);
-  let strukt_name = &strukt.clone().name;
+  let strukt = syn::parse_macro_input!(tokens as ByteMeStruct);
 
-  let start = core::cell::Cell::new(0 as usize);
-  let ref_start = &start;
-  let size: usize = strukt.fields.clone().iter().clone().map(|field| field.size).sum();
-  let fields = strukt.fields.clone();
-  let fields = fields.iter().clone().map(|f| {
-    let name = &f.name;
-    quote::quote! {#name,}
-  });
-  
   let fn_lines_to_bytes = strukt.fields.iter().clone().map(|field| to_bytes_fn_factory(field));
-  let fn_line_from_bytes = strukt.fields
+
+  let count = core::cell::Cell::new(0 as usize);
+  let count_ = &count;
+  let fn_line_from_bytes = strukt
+    .fields
     .iter()
     .clone()
-    .map(|field| from_bytes_fn_factory(field, ref_start));
+    .map(|field| from_bytes_fn_factory(field, count_));
 
-  let out = quote::quote! {
-    impl #strukt_name {
+  let name = &strukt.ident;
+  let size: usize = strukt.fields.clone().iter().clone().map(|field| field.size).sum();
+  let fields = strukt.fields.iter().clone().map(|field| get_field_name(&field));
+  let processed = quote::quote! {
+    impl #name {
       const SIZE: usize = #size;
 
       pub fn to_bytes(&self) -> Vec<u8> {
@@ -56,12 +54,12 @@ pub fn derive(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     }
   };
 
-  out.into()
+  processed.into()
 }
 
 /// Creates a line for `to_bytes` function for a single field depending on the data_type
 fn to_bytes_fn_factory(field: &ByteMeField) -> proc_macro2::TokenStream {
-  let name = &field.name;
+  let name = &field.ident;
   let data_type = &field.data_type;
 
   if field.is_array == true {
@@ -76,16 +74,14 @@ fn to_bytes_fn_factory(field: &ByteMeField) -> proc_macro2::TokenStream {
 }
 
 /// Creates a line for `from_bytes` function for a single field depending on the data_type
-fn from_bytes_fn_factory(field: &ByteMeField, ref_start: &core::cell::Cell<usize>) -> proc_macro2::TokenStream {
-  let name = &field.name;
+fn from_bytes_fn_factory(field: &ByteMeField, count_: &core::cell::Cell<usize>) -> proc_macro2::TokenStream {
+  let name = &field.ident;
   let size = &field.size;
   let data_type = &field.data_type;
-  let start = ref_start.get();
+
+  let start = count_.get();
   let end = start + field.size;
-  ref_start.set(end);
-  eprintln!("{}", field.name);
-  eprintln!("{}", start);
-  eprintln!("{}", end);
+  count_.set(end);
 
   // The first line is the same for all data types
   let lines = quote::quote! {
@@ -123,16 +119,24 @@ fn from_bytes_fn_factory(field: &ByteMeField, ref_start: &core::cell::Cell<usize
   lines
 }
 
+/// Given `ByteMeField`, returns a TokenStream with only name of the field
+fn get_field_name(field: &ByteMeField) -> proc_macro2::TokenStream {
+  let name = &field.ident;
+  quote::quote! {#name,}
+}
+
+/// Summary of the proc_macro::TokenStream
 #[derive(Debug, Clone)]
 struct ByteMeStruct {
-  name: syn::Ident,
+  ident: syn::Ident,
   fields: Vec<ByteMeField>,
 }
 
+/// Represents a single field in the struct
 #[derive(Debug, Clone)]
 struct ByteMeField {
   /// Represents the name of the fields
-  name: syn::Ident,
+  ident: syn::Ident,
   /// Represents the number of bytes that the field takes up.
   size: usize,
   /// Represents the positive integer type of the field.
@@ -143,24 +147,27 @@ struct ByteMeField {
   attribute_for: Option<syn::Ident>,
 }
 
+/// Implements parser for ByteMeStruct
 impl syn::parse::Parse for ByteMeStruct {
   fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
     let strukt = input.parse::<syn::ItemStruct>()?;
-    let name = strukt.ident.clone();
+    let ident = strukt.ident.clone();
     let mut fields: Vec<ByteMeField> = Vec::new();
     for f in strukt.fields {
       let field = ByteMeField::try_from(&f)?;
       fields.push(field);
     }
-    Ok(Self { name, fields })
+    Ok(Self { ident, fields })
   }
 }
 
+/// Implements TryFrom for ByteMeField
 impl TryFrom<&syn::Field> for ByteMeField {
   type Error = syn::Error;
 
+  /// Parses a field and returns a ByteMeField
   fn try_from(field: &syn::Field) -> Result<Self, Self::Error> {
-    let name = field
+    let ident = field
       .ident
       .clone()
       .ok_or_else(|| {
@@ -202,7 +209,7 @@ impl TryFrom<&syn::Field> for ByteMeField {
           // Currently we only support u8 arrays
           if is_u8(&elem.path) == true {
             Ok(Self {
-              name,
+              ident,
               size,
               data_type: syn::Ident::new("u8", proc_macro2::Span::call_site()),
               is_array: true,
@@ -217,7 +224,7 @@ impl TryFrom<&syn::Field> for ByteMeField {
           let data_type = Some(path.clone().segments.clone().into_iter().next().unwrap().ident.clone());
           let size: usize = get_byte_size_from_integer_type(data_type.clone().unwrap()).unwrap();
           Ok(Self {
-            name,
+            ident,
             size,
             data_type: data_type.unwrap(),
             is_array: false,
@@ -230,7 +237,7 @@ impl TryFrom<&syn::Field> for ByteMeField {
           let data_type: syn::Ident = syn::parse_quote!(#attribute);
           let size: usize = get_byte_size_from_integer_type(data_type.clone()).unwrap();
           Ok(Self {
-            name,
+            ident,
             size,
             data_type,
             is_array: false,
@@ -267,6 +274,9 @@ fn get_byte_size_from_integer_type(ident: syn::Ident) -> Result<usize, syn::Erro
     "u64" => Ok(8),
     "u128" => Ok(16),
     "usize" => Ok(8),
-    _ => Err(syn::Error::new_spanned(ident, "Unsupported type")),
+    _ => Err(syn::Error::new_spanned(
+      ident,
+      "Unsupported type. We can only process positive integers or Enums",
+    )),
   }
 }

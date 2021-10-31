@@ -1,4 +1,6 @@
 use super::Accept;
+use num_traits::FromPrimitive;
+use byteme::ByteMe;
 /// The server MUST respond with the following Server-Start message:
 /// ```text
 ///    0                   1                   2                   3
@@ -22,7 +24,7 @@ use super::Accept;
 ///    |                                                               |
 ///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 /// ```
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, ByteMe)]
 pub struct ServerStartFrame {
   /// The MBZ parts MUST be zero.  The client MUST ignore their value.  MBZ
   /// (MUST be zero) fields here and after have the same semantics: the
@@ -43,6 +45,7 @@ pub struct ServerStartFrame {
   ///
   /// /// If a negative (non-zero) response is sent, the server MAY (and the
   /// client SHOULD) close the connection after this message.
+  #[byte_me(u8)]
   pub accept: Accept,
   /// Server-IV is generated randomly by the server.  In unauthenticated
   /// mode, Server-IV is unused.

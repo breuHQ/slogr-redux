@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use num_derive::FromPrimitive;
 
 /// The value of the Modes field sent by the server is the bit-wise OR of the
 /// mode values that it is willing to support during this session. Thus, the
@@ -14,8 +14,7 @@ use serde::{Deserialize, Serialize};
 /// SHOULD close the connection if it receives a greeting with Modes
 /// equal to zero.  The client MAY close the connection if the client's
 /// desired mode is unavailable.
-#[repr(u32)]
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, FromPrimitive)]
 pub enum Mode {
   /// 0: The server is not willing to accept any more sessions.
   Unavailable = 0,
