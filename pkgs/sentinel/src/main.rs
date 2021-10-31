@@ -1,6 +1,6 @@
 mod commands;
 
-use clap::{App, load_yaml};
+use clap::{load_yaml, App};
 use tokio::runtime::Runtime;
 use tracing::{debug, info, Level};
 use tracing_subscriber::FmtSubscriber;

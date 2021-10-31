@@ -1,6 +1,6 @@
 use super::Accept;
-use num_traits::FromPrimitive;
 use byteme::ByteMe;
+use num_traits::FromPrimitive;
 /// The server MUST respond with the following Server-Start message:
 /// ```text
 ///    0                   1                   2                   3

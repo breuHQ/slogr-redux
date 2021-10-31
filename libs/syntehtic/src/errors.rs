@@ -7,8 +7,8 @@ pub enum SyntheticError {
   /// An error when the port is unavilable
   #[error("Port already in use: {port:?}")]
   PortUnavailable {
-    /// The port that is unavailable 
-    port: String 
+    /// The port that is unavailable
+    port: String,
   },
 
   /// The requested greeting mode is not avilable for the given server

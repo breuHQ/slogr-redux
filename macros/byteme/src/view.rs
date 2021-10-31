@@ -1,6 +1,6 @@
 use byteme::ByteMe;
-use num_traits::FromPrimitive;
 use num_derive::FromPrimitive;
+use num_traits::FromPrimitive;
 
 #[derive(Copy, Clone, FromPrimitive)]
 pub enum ServerGreetingMode {

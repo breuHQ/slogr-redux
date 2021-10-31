@@ -9,8 +9,8 @@ mod server_start;
 mod setup_response;
 
 pub use self::{
-  accept::Accept, ipvn::IpVn, mode::Mode, request_session::RequestSessionFrame,
-  server_greeting::ServerGreetingFrame, server_start::ServerStartFrame, setup_response::SetupResponseFrame,
+  accept::Accept, ipvn::IpVn, mode::Mode, request_session::RequestSessionFrame, server_greeting::ServerGreetingFrame,
+  server_start::ServerStartFrame, setup_response::SetupResponseFrame,
 };
 
 /// Protocol agnostic frame implementation. Represents all the possible information arrangements

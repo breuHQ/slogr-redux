@@ -1,5 +1,5 @@
 #[test]
 fn tests() {
-    let test = trybuild::TestCases::new();
-    test.pass("tests/01-build.rs");
+  let test = trybuild::TestCases::new();
+  test.pass("tests/01-build.rs");
 }

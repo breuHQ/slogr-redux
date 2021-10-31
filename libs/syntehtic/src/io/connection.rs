@@ -10,7 +10,7 @@ use tracing::{debug, info};
 
 use crate::{
   errors::SyntheticError,
-  frames::{ServerGreetingFrame, Mode, SetupResponseFrame},
+  frames::{Mode, ServerGreetingFrame, SetupResponseFrame},
 };
 
 /// Represents a connection to the underlying stream.
@@ -33,11 +33,7 @@ impl Connection {
     let stream = BufWriter::new(stream);
     let mode = Mode::Unauthenticated; // TODO: Get this from global configuration.
 
-    Self {
-      stream,
-      addr,
-      mode,
-    }
+    Self { stream, addr, mode }
   }
 
   /// Sends a server greeting frame from the server
