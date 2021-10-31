@@ -1,6 +1,9 @@
 use byteme::ByteMe;
+pub use num_derive::FromPrimitive;
+pub use num_traits::FromPrimitive;
 
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+
+#[derive(Debug, FromPrimitive, PartialEq, Eq, Clone, Copy)]
 pub enum Mode {
   Unavailable = 0,
   Unauthenticated = 1,
@@ -32,23 +35,17 @@ fn main() {
 
   let bytes = frame.to_bytes();
 
-  let unused = bytes[0 .. 12].to_vec();
+  let unused: [u8; 12] = bytes[0 .. 12].try_into().unwrap();
   
-  let mode: [u8; 4] = bytes[12 .. 16].to_vec().as_slice().try_into().unwrap();
+  let mode: [u8; 4] = bytes[12 .. 16].try_into().unwrap();
   let mode = u32::from_be_bytes(mode);
-  let mode = match mode {
-    0 => Mode::Unavailable,
-    1 => Mode::Unauthenticated,
-    2 => Mode::Authenticated,
-    4 => Mode::Encrypted,
-    _ => panic!("Unknown mode"),
-  };
+  let mode = Mode::from_u32(mode).unwrap();
 
-  let challenge = bytes[16 .. 32].to_vec();
-  let salt = bytes[32 .. 48].to_vec();
-  let count: [u8; 4] = bytes[48 .. 52].to_vec().as_slice().try_into().unwrap();
+  let challenge: [u8; 16] = bytes[16 .. 32].try_into().unwrap();
+  let salt: [u8; 16] = bytes[32 .. 48].try_into().unwrap();
+  let count: [u8; 4] = bytes[48 .. 52].try_into().unwrap();
   let count = u32::from_be_bytes(count);
-  let mbz = bytes[52 .. 64].to_vec();
+  let mbz: [u8; 12] = bytes[52 .. 64].try_into().unwrap();
 
   assert_eq!(bytes.len(), 64);
   assert_eq!(unused, frame.unused);

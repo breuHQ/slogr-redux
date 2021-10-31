@@ -29,11 +29,11 @@ impl Client {
           match frame.len() {
             64 => {
               let bytes = frame.to_vec();
-              debug!("decoded {:?}", bytes.len());
+              debug!("decoded {:?}", bytes);
             }
             164 => {
               let bytes = frame.to_vec();
-              debug!("decoded {:?}", bytes.len());
+              debug!("decoded {:?}", bytes);
             }
             _ => debug!("unknown length"),
           }

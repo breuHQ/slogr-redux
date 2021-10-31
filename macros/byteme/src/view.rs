@@ -1,6 +1,8 @@
 use byteme::ByteMe;
+use num_traits::FromPrimitive;
+use num_derive::FromPrimitive;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, FromPrimitive)]
 pub enum ServerGreetingMode {
   Unavailable = 0,
   Unauthenticated = 1,
@@ -11,11 +13,11 @@ pub enum ServerGreetingMode {
 #[derive(ByteMe)]
 pub struct ServerGreetingFrame {
   pub unused: [u8; 12],
-  #[byte_me(u32)]
+  #[byte_me(u8)]
   pub mode: ServerGreetingMode,
   pub challenge: [u8; 16],
   pub salt: [u8; 16],
-  pub count: u16,
+  pub count: u32,
   pub mbz: [u8; 12],
 }
 

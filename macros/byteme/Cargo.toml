@@ -23,6 +23,8 @@ path = "src/view.rs"
 trybuild = { version = "1.0.49", features = ["diff"] }
 
 [dependencies]
+num-derive = "0.3.3"
+num-traits = "0.2.14"
 proc-macro2 = "1.0.30"
 quote = "1.0.10"
-syn = { version = "1.0.80", features = ["full"] }
+syn = { version = "1.0.80", features = ["full", "extra-traits"] }
