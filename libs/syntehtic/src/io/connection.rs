@@ -38,29 +38,10 @@ impl Connection {
 
   /// Sends a server greeting frame from the server
   pub async fn send_server_greeting(&mut self) -> Result<(), std::io::Error> {
-    let frame = ServerGreetingFrame::with_mode(self.mode);
-
-    info!("Server greeting mode: {:?}", self.mode);
-    info!("Sending server greeting frame");
-
-    debug!("ServerGreetingFrame [unused]: {:?}", frame.unused);
-    self.stream.write_all(&frame.unused).await?;
-
-    debug!("ServerGreetingFrame [mode]: {:?}", (frame.mode as u32).to_be_bytes());
-    self.stream.write_all(&(self.mode as u32).to_be_bytes()).await?;
-
-    debug!("ServerGreetingFrame [challenge]: {:?}", frame.challenge);
-    self.stream.write_all(&frame.challenge).await?;
-
-    debug!("ServerGreetingFrame [salt]: {:?}", frame.salt);
-    self.stream.write_all(&frame.salt).await?;
-
-    debug!("ServerGreetingFrame [count]: {:?}", (frame.count as u32).to_be_bytes());
-    self.stream.write_all(&(frame.count as u32).to_be_bytes()).await?;
-
-    debug!("ServerGreetingFrame [mbz]: {:?}", frame.mbz);
-    self.stream.write_all(&frame.mbz).await?;
-
+    let bytes = ServerGreetingFrame::with_mode(self.mode).to_bytes();
+    let bytes = bytes.as_slice();
+    debug!("Sending server greeting frame: {:?}", bytes);
+    self.stream.write_all(bytes).await?;
     self.stream.flush().await?;
     info!("Finished sending server greeting frame");
 
@@ -74,25 +55,12 @@ impl Connection {
 
   /// Sends the setup response frame to the server.
   pub async fn send_setup_response(&mut self) -> Result<(), std::io::Error> {
-    let frame = SetupResponseFrame::with_mode(self.mode);
+    let bytes = SetupResponseFrame::with_mode(self.mode).to_bytes();
+    let bytes = bytes.as_slice();
 
     info!("Sending setup response frame");
-
-    debug!("SetupResponseFrame [mode]: {:?}", self.mode);
-    self.stream.write_all(&(self.mode as u32).to_be_bytes()).await?;
-
-    debug!("SetupResponseFrame [key_id]: {:?}", frame.key_id);
-    self.stream.write_all(&frame.key_id).await?;
-
-    debug!("SetupResponseFrame [token]: {:?}", frame.token);
-    self.stream.write_all(&frame.token).await?;
-
-    debug!("SetupResponseFrame [client_iv]: {:?}", frame.client_iv);
-    self.stream.write_all(&frame.client_iv).await?;
-
+    self.stream.write_all(&bytes).await?;
     self.stream.flush().await?;
-    info!("Finished sending setup response frame");
-
     Ok(())
   }
 }
