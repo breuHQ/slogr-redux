@@ -14,6 +14,12 @@
 //!   - an enum
 //! - For enum, we must attach a `#[byte_me($size)]` attribute, where size is any of the positive integer types.
 //! - The enum declration must `#[derive(FromPrimitive)]` from the `num-derive` crate.
+//! 
+//! The `num-derive` crate is required to generate the `FromPrimitive` trait for enums. Having said that, the same 
+//! functionality can be achieved using `num-enum` crate. It provides furthur control over the enum data types,
+//! and might prove handy. here is the discussion on the topic.
+//! 
+//! https://github.com/illicitonion/num_enum/issues/61#issuecomment-955804109
 
 use crate::models::{ByteMeField, ByteMeStruct};
 mod models;
@@ -78,14 +84,14 @@ fn to_bytes_fn_factory(field: &ByteMeField) -> proc_macro2::TokenStream {
 }
 
 /// Creates a line for `from_bytes` function for a single field depending on the data_type
-fn from_bytes_fn_factory(field: &ByteMeField, count_: &core::cell::Cell<usize>) -> proc_macro2::TokenStream {
+fn from_bytes_fn_factory(field: &ByteMeField, count: &core::cell::Cell<usize>) -> proc_macro2::TokenStream {
   let name = &field.ident;
   let size = &field.size;
   let data_type = &field.data_type;
 
-  let start = count_.get();
+  let start = count.get();
   let end = start + field.size;
-  count_.set(end);
+  count.set(end);
 
   // The first line is the same for all data types
   let lines = quote::quote! {
