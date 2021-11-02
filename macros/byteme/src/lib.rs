@@ -14,11 +14,11 @@
 //!   - an enum
 //! - For enum, we must attach a `#[byte_me($size)]` attribute, where size is any of the positive integer types.
 //! - The enum declration must `#[derive(FromPrimitive)]` from the `num-derive` crate.
-//! 
-//! The `num-derive` crate is required to generate the `FromPrimitive` trait for enums. Having said that, the same 
+//!
+//! The `num-derive` crate is required to generate the `FromPrimitive` trait for enums. Having said that, the same
 //! functionality can be achieved using `num-enum` crate. It provides furthur control over the enum data types,
 //! and might prove handy. here is the discussion on the topic.
-//! 
+//!
 //! https://github.com/illicitonion/num_enum/issues/61#issuecomment-955804109
 
 use crate::models::{ByteMeField, ByteMeStruct};

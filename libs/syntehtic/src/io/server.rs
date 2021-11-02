@@ -26,7 +26,7 @@ impl Server {
     loop {
       let (stream, addr) = listener.accept().await?;
       let connection = Connection::new(stream, addr);
-      tokio::spawn(Server::handle(connection));
+      tokio::spawn(Server::handle(connection)); // TODO: Investigate if we have a problem here.
     }
   }
 

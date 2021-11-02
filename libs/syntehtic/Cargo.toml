@@ -17,3 +17,4 @@ tokio-stream = "0.1.7"
 tokio-util = {version = "0.6.8", features = ["full"]}
 tracing = {version = "0.1.29", default-features = false, features = ["attributes"]}
 tracing-subscriber = "0.2.25"
+xtra = "0.5.1"
