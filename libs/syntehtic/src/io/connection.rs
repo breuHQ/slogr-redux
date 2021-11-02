@@ -59,7 +59,7 @@ impl Connection {
     let bytes = bytes.as_slice();
 
     info!("Sending setup response frame");
-    self.stream.write_all(&bytes).await?;
+    self.stream.write_all(bytes).await?;
     self.stream.flush().await?;
     Ok(())
   }
