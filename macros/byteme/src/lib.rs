@@ -45,7 +45,8 @@ pub fn derive(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
   let fields = strukt.fields.iter().clone().map(|field| get_field_name(field));
   let processed = quote::quote! {
     impl #name {
-      const SIZE: usize = #size;
+      /// Size of the struct in bytes
+      pub const SIZE: usize = #size;
 
       /// Convert the struct to a byte array.
       pub fn to_bytes(&self) -> Vec<u8> {
