@@ -22,7 +22,7 @@ pub enum SyntheticError {
 
   /// Error while trying to convert bytes to frame
   #[error("Invalid or empty frame")]
-  InvalidFrame,
+  IllegalFrame,
 
   /// transparently communicating back errors
   #[error(transparent)]
