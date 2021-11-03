@@ -4,10 +4,10 @@ use std::net::SocketAddr;
 
 use tokio::net::TcpStream;
 use tokio_stream::StreamExt;
-use tokio_util::codec::{BytesCodec, Decoder};
+use tokio_util::codec::Decoder;
 use tracing::debug;
 
-use crate::{errors::SyntheticError, io::connection::Connection, frames::SynteticFrameCodec};
+use crate::{errors::SyntheticError, frames::SyntheticFrameCodec, io::connection::Connection};
 
 /// Serves as a container for the client connection.
 #[derive(Debug)]
@@ -21,7 +21,7 @@ impl Client {
   pub async fn connect() -> Result<(), SyntheticError> {
     let addr = "127.0.0.1:9000".parse::<SocketAddr>().unwrap();
     let stream = TcpStream::connect(addr).await?;
-    let mut framed = SynteticFrameCodec::new().framed(stream);
+    let mut framed = SyntheticFrameCodec::new().framed(stream);
     while let Some(frame) = framed.next().await {
       debug!("{:?}", frame);
     }

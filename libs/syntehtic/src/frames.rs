@@ -33,16 +33,16 @@ pub enum SyntheticFrame {
 
 /// Codec for [SyntehticFrame]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
-pub struct SynteticFrameCodec(());
+pub struct SyntheticFrameCodec(());
 
-impl SynteticFrameCodec {
+impl SyntheticFrameCodec {
   /// Creates a new instance of the codec
   pub fn new() -> Self {
-    SynteticFrameCodec(())
+    SyntheticFrameCodec(())
   }
 }
 
-impl Decoder for SynteticFrameCodec {
+impl Decoder for SyntheticFrameCodec {
   type Item = SyntheticFrame;
   type Error = SyntheticError;
 
@@ -71,7 +71,7 @@ impl Decoder for SynteticFrameCodec {
   }
 }
 
-impl Encoder<SyntheticFrame> for SynteticFrameCodec {
+impl Encoder<SyntheticFrame> for SyntheticFrameCodec {
   type Error = SyntheticError;
 
   fn encode(&mut self, frame: SyntheticFrame, dst: &mut BytesMut) -> Result<(), Self::Error> {

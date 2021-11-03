@@ -3,10 +3,10 @@ use std::net::SocketAddr;
 
 use tokio::net::TcpListener;
 use tokio_stream::StreamExt;
-use tokio_util::codec::{BytesCodec, Decoder};
+use tokio_util::codec::Decoder;
 use tracing::debug;
 
-use crate::io::connection::Connection;
+use crate::{frames::SyntheticFrameCodec, io::connection::Connection};
 
 /// Defines the server as per the RFC definition.
 #[derive(Debug)]
@@ -36,7 +36,7 @@ impl Server {
       connection.send_server_greeting().await?;
       connection.send_setup_response().await?;
 
-      let mut framed = BytesCodec::new().framed(connection.stream);
+      let mut framed = SyntheticFrameCodec::new().framed(connection.stream);
       while let Some(message) = framed.next().await {
         match message {
           Ok(bytes) => println!("bytes: {:?}", bytes),
