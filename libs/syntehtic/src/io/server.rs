@@ -1,12 +1,17 @@
 //! When our agent is serving as a server, we need to be able to send messages to the client.
+use futures::sink::SinkExt;
 use std::net::SocketAddr;
 
 use tokio::net::TcpListener;
 use tokio_stream::StreamExt;
-use tokio_util::codec::Decoder;
+use tokio_util::codec::Framed;
 use tracing::debug;
 
-use crate::{errors::SyntheticError, frames::SyntheticFrameCodec, io::connection::Connection};
+use crate::{
+  errors::SyntheticError,
+  frames::{Mode, ServerGreetingFrame, SetupResponseFrame, SyntheticFrame, SyntheticFrameCodec},
+  io::connection::Connection,
+};
 
 /// Defines the server as per the RFC definition.
 #[derive(Debug)]
@@ -31,17 +36,24 @@ impl Server {
   }
 
   /// handles the connection
-  async fn handle(mut connection: Connection) -> Result<(), SyntheticError> {
-    connection.send_server_greeting().await?;
-    connection.send_setup_response().await?;
+  async fn handle(connection: Connection) -> Result<(), SyntheticError> {
+    let mut framed = Framed::new(connection.stream, SyntheticFrameCodec::new());
+    let mode = Mode::Unauthenticated;
+    framed
+      .send(SyntheticFrame::ServerGreeting(ServerGreetingFrame::with_mode(mode)))
+      .await?;
+    // I should be able to different frames and get it decoded.
+    framed
+      .send(SyntheticFrame::SetUpResponse(SetupResponseFrame::with_mode(mode)))
+      .await?;
 
-    let mut framed = SyntheticFrameCodec::new().framed(connection.stream);
     while let Some(message) = framed.next().await {
       match message {
         Ok(bytes) => println!("bytes: {:?}", bytes),
         Err(err) => Err(err)?,
       }
     }
+
     Ok(())
   }
 }

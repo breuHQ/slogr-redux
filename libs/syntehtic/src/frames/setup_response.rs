@@ -1,6 +1,5 @@
 use super::Mode;
 use byteme::ByteMe;
-use num_traits::FromPrimitive;
 
 /// The client MUST respond with the following Set-Up-Response message:
 ///
