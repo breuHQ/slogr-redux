@@ -37,7 +37,7 @@ impl Connection {
   }
 
   /// Sends a server greeting frame from the server
-  pub async fn send_server_greeting(&mut self) -> Result<(), std::io::Error> {
+  pub async fn send_server_greeting(&mut self) -> Result<(), SyntheticError> {
     let bytes = ServerGreetingFrame::with_mode(self.mode).to_bytes();
     let bytes = bytes.as_slice();
     debug!("Sending server greeting frame: {:?}", bytes);
@@ -54,7 +54,7 @@ impl Connection {
   }
 
   /// Sends the setup response frame to the server.
-  pub async fn send_setup_response(&mut self) -> Result<(), std::io::Error> {
+  pub async fn send_setup_response(&mut self) -> Result<(), SyntheticError> {
     let bytes = SetupResponseFrame::with_mode(self.mode).to_bytes();
     let bytes = bytes.as_slice();
 

@@ -5,7 +5,6 @@ use std::net::SocketAddr;
 use tokio::net::TcpStream;
 use tokio_stream::StreamExt;
 use tokio_util::codec::Decoder;
-use tracing::debug;
 
 use crate::{errors::SyntheticError, frames::SyntheticFrameCodec, io::connection::Connection};
 
@@ -22,9 +21,12 @@ impl Client {
     let addr = "127.0.0.1:9000".parse::<SocketAddr>().unwrap();
     let stream = TcpStream::connect(addr).await?;
     let mut framed = SyntheticFrameCodec::new().framed(stream);
-    while let Some(frame) = framed.next().await {
-      debug!("{:?}", frame);
+    while let Some(message) = framed.next().await {
+      match message {
+        Ok(bytes) => println!("bytes: {:?}", bytes),
+        Err(err) => Err(err)?,
+      }
     }
-    Err(SyntheticError::IllegalFrame)
+    Ok(())
   }
 }

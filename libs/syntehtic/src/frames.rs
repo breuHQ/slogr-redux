@@ -10,6 +10,7 @@ mod setup_response;
 
 use bytes::{BufMut, BytesMut};
 use tokio_util::codec::{Decoder, Encoder};
+use tracing::debug;
 
 use crate::errors::SyntheticError;
 
@@ -54,6 +55,8 @@ impl Decoder for SyntheticFrameCodec {
     if size < 1 {
       return Ok(None);
     }
+
+    debug!("size: {}", size);
 
     match size {
       ServerGreetingFrame::SIZE => Ok(Some(SyntheticFrame::ServerGreeting(ServerGreetingFrame::from_bytes(
