@@ -57,10 +57,21 @@ pub fn derive(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
 
       /// Convert the byte array to a struct.
       pub fn from_bytes(bytes: Vec<u8>) -> Self {
+        // This import from the `num-traits` crate is required to use the `FromPrimitive` trait.
+        // If the field is an enum, or any of the positive integer types, we quickly get the required
+        // value from a [u8] array.
+        use num_traits::FromPrimitive;
+        // Converting `[u8]` to fields based on their length.
         #(#fn_line_from_bytes)*
+        // Returning the struct.
         Self {
           #(#fields)*
         }
+      }
+
+      /// Gets the delimiter as a vector of bytes.
+      pub fn get_delimiter(self) -> Vec<u8> {
+        (Self::SIZE as u16).to_be_bytes().to_vec()
       }
     }
   };
@@ -99,7 +110,7 @@ fn from_bytes_fn_factory(field: &ByteMeField, count: &core::cell::Cell<usize>) -
     let #name: [u8; #size] = bytes[#start .. #end].try_into().unwrap();
   };
 
-  // If it is not an array and if it doesn't have an atrribute, we can safely assume it is a positive integer.
+  // If the field is not a `[u8]` and if it doesn't have an atrribute, we can safely assume it is a positive integer.
   // In this case, we would have to return the value as the type on the field.
   let lines = if !field.is_array && field.attribute_for.is_none() {
     quote::quote! {
@@ -112,14 +123,15 @@ fn from_bytes_fn_factory(field: &ByteMeField, count: &core::cell::Cell<usize>) -
     }
   };
 
+  // If the field is not an array
   let lines = if !field.is_array && field.attribute_for.is_some() {
-    let attribute_for = &field.attribute_for.clone();
-    let prepend = data_type.to_string();
-    let prepend = syn::Ident::new(format!("from_{}", prepend).as_str(), proc_macro2::Span::call_site());
+    let enum_name = &field.attribute_for.clone();
+    let enum_data_type = data_type.to_string();
+    let from_enum_data_type = syn::Ident::new(format!("from_{}", enum_data_type).as_str(), proc_macro2::Span::call_site());
     quote::quote! {
       #lines
       let #name = #data_type::from_be_bytes(#name);
-      let #name = #attribute_for::#prepend(#name).unwrap();
+      let #name = #enum_name::#from_enum_data_type(#name).unwrap();
     }
   } else {
     quote::quote! {

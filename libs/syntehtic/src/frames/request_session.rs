@@ -1,6 +1,5 @@
 use super::IpVn;
 use byteme::ByteMe;
-use num_traits::FromPrimitive;
 
 /// Test session creation follows the same procedure as defined in
 /// Section 3.5 of OWAMP RFC4656.  The Request-TW-Session command is

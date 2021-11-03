@@ -1,6 +1,6 @@
 use super::Mode;
 use byteme::ByteMe;
-use num_traits::FromPrimitive;
+
 ///   The server greeting frame required for connection handshake.
 ///
 /// ```text
