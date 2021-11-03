@@ -6,7 +6,7 @@ use tokio_stream::StreamExt;
 use tokio_util::codec::Decoder;
 use tracing::debug;
 
-use crate::{frames::SyntheticFrameCodec, io::connection::Connection};
+use crate::{errors::SyntheticError, frames::SyntheticFrameCodec, io::connection::Connection};
 
 /// Defines the server as per the RFC definition.
 #[derive(Debug)]
@@ -18,7 +18,7 @@ pub struct Server {
 /// Represents a single connection to the server.
 impl Server {
   /// Starts a new server.
-  pub async fn run() -> Result<TcpListener, std::io::Error> {
+  pub async fn run() -> Result<TcpListener, SyntheticError> {
     let listener = TcpListener::bind("0.0.0.0:9000").await?;
     // .expect(msg!("Failed to bind to port 9000"));
     debug!("Server started on port 9000");
@@ -31,20 +31,17 @@ impl Server {
   }
 
   /// handles the connection
-  async fn handle(mut connection: Connection) -> Result<(), std::io::Error> {
-    let result = tokio::spawn(async move {
-      connection.send_server_greeting().await?;
-      connection.send_setup_response().await?;
+  async fn handle(mut connection: Connection) -> Result<(), SyntheticError> {
+    connection.send_server_greeting().await?;
+    connection.send_setup_response().await?;
 
-      let mut framed = SyntheticFrameCodec::new().framed(connection.stream);
-      while let Some(message) = framed.next().await {
-        match message {
-          Ok(bytes) => println!("bytes: {:?}", bytes),
-          Err(err) => eprintln!("Socket closed with error: {:?}", err),
-        }
+    let mut framed = SyntheticFrameCodec::new().framed(connection.stream);
+    while let Some(message) = framed.next().await {
+      match message {
+        Ok(bytes) => println!("bytes: {:?}", bytes),
+        Err(err) => Err(err)?,
       }
-      Ok(())
-    });
-    result.await?
+    }
+    Ok(())
   }
 }
