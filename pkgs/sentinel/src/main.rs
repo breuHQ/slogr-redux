@@ -36,6 +36,6 @@ fn main() {
 /// TODO: we need to add configuration setup. The plan to have one global config singleton object, and subsequent calls
 /// to them will reference that global object.
 fn prelude() {
-  let subscriber = FmtSubscriber::builder().with_max_level(Level::TRACE).finish();
+  let subscriber = FmtSubscriber::builder().pretty().with_max_level(Level::TRACE).with_thread_ids(true).finish();
   tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
 }

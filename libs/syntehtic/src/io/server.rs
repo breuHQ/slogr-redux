@@ -8,8 +8,9 @@ use tokio_util::codec::Framed;
 use tracing::debug;
 
 use crate::{
+  codec::SyntheticFrameCodec,
   errors::SyntheticError,
-  frames::{Mode, ServerGreetingFrame, SetupResponseFrame, SyntheticFrame, SyntheticFrameCodec},
+  frames::{Mode, ServerGreetingFrame, SetupResponseFrame, SyntheticFrame},
   io::connection::Connection,
 };
 

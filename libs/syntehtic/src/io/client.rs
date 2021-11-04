@@ -7,7 +7,7 @@ use tokio_stream::StreamExt;
 use tokio_util::codec::Decoder;
 use tracing::debug;
 
-use crate::{errors::SyntheticError, frames::SyntheticFrameCodec, io::connection::Connection};
+use crate::{codec::SyntheticFrameCodec, errors::SyntheticError, io::connection::Connection};
 
 /// Serves as a container for the client connection.
 #[derive(Debug)]

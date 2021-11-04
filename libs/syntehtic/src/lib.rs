@@ -113,7 +113,8 @@
 //! ATM segmentation and reassembly (SAR).  Consequently, OWAMP has been
 //! designed to allow for small test packets that would fit inside the
 //! payload of a single ATM cell (this is only achieved in unauthenticated mode).
-
+#[warn(missing_debug_implementations, missing_docs)]
+pub mod codec;
 #[warn(missing_debug_implementations, missing_docs)]
 pub mod errors;
 #[warn(missing_debug_implementations, missing_docs)]
