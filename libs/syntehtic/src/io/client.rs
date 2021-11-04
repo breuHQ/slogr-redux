@@ -28,7 +28,7 @@ impl Client {
         Ok(f) => debug!("Recieved Frame: {:?}", f),
         Err(err) => Err(err)?,
       }
-    };
+    }
     Ok(())
   }
 }

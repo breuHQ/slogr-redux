@@ -38,7 +38,6 @@ impl Decoder for SyntheticFrameCodec {
     let payload: Vec<u8> = src[2..(size + 2)].to_vec();
     src.advance(size + 2);
 
-
     if size == 0 {
       return Ok(None);
     }

@@ -34,7 +34,7 @@ pub struct ByteMeField {
   /// Represents if the field is an array
   pub is_array: bool,
   /// Name of the enum for which the `#[byte_me($size)]` attribute is attached.
-  pub attribute_for: Option<syn::Ident>,
+  pub attribute: Option<syn::Ident>,
 }
 
 /// Implements TryFrom for ByteMeField
@@ -88,7 +88,7 @@ impl TryFrom<&syn::Field> for ByteMeField {
               size,
               data_type: syn::Ident::new("u8", proc_macro2::Span::call_site()),
               is_array: true,
-              attribute_for: None,
+              attribute: None,
             })
           } else {
             Err(syn::Error::new_spanned(field.into_token_stream(), "`u8` is the only supported type for arrays"))
@@ -103,12 +103,15 @@ impl TryFrom<&syn::Field> for ByteMeField {
             size,
             data_type,
             is_array: false,
-            attribute_for: None,
+            attribute: None,
           })
         },
-        // Check for the custom struct with a `#[byte_me]` attribute defining any of the unsigned integer.
+        // Check for the custom field type (can be a struct or enum) with a `#[byte_me($type)]`
+        // where type can only be a positive integer. Right now we are only assume that it is an enum
+        //
+        // TODO: Add support for custom structs
         syn::Type::Path(syn::TypePath {path, ..}) if attribute.is_some() => {
-          let attribute_for = Some(path.segments.into_iter().next().unwrap().ident);
+          let attribute_data_type = Some(path.segments.into_iter().next().unwrap().ident);
           let data_type: syn::Ident = syn::parse_quote!(#attribute);
           let size: usize = get_byte_size_from_integer_type(data_type.clone()).unwrap();
           Ok(Self {
@@ -116,7 +119,7 @@ impl TryFrom<&syn::Field> for ByteMeField {
             size,
             data_type,
             is_array: false,
-            attribute_for,
+            attribute: attribute_data_type,
           })
         },
         // Raise Error if the conditions are not met.

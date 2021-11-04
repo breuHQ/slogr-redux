@@ -14,11 +14,11 @@
 //!   - an enum
 //! - For enum, we must attach a `#[byte_me($size)]` attribute, where size is any of the positive integer types.
 //! - The enum declration must `#[derive(FromPrimitive)]` from the `num-derive` crate.
-//! 
-//! The `num-derive` crate is required to generate the `FromPrimitive` trait for enums. Having said that, the same 
+//!
+//! The `num-derive` crate is required to generate the `FromPrimitive` trait for enums. Having said that, the same
 //! functionality can be achieved using `num-enum` crate. It provides furthur control over the enum data types,
 //! and might prove handy. here is the discussion on the topic.
-//! 
+//!
 //! https://github.com/illicitonion/num_enum/issues/61#issuecomment-955804109
 
 use crate::models::{ByteMeField, ByteMeStruct};
@@ -112,7 +112,7 @@ fn from_bytes_fn_factory(field: &ByteMeField, count: &core::cell::Cell<usize>) -
 
   // If the field is not a `[u8]` and if it doesn't have an atrribute, we can safely assume it is a positive integer.
   // In this case, we would have to return the value as the type on the field.
-  let lines = if !field.is_array && field.attribute_for.is_none() {
+  let lines = if !field.is_array && field.attribute.is_none() {
     quote::quote! {
       #lines
       let #name = #data_type::from_be_bytes(#name);
@@ -123,11 +123,14 @@ fn from_bytes_fn_factory(field: &ByteMeField, count: &core::cell::Cell<usize>) -
     }
   };
 
-  // If the field is not an array
-  let lines = if !field.is_array && field.attribute_for.is_some() {
-    let enum_name = &field.attribute_for.clone();
+  // If the field is not an array and has an attribute byteme, we can safely assume the field is an enum.
+  let lines = if !field.is_array && field.attribute.is_some() {
+    let enum_name = &field.attribute.clone();
     let enum_data_type = data_type.to_string();
-    let from_enum_data_type = syn::Ident::new(format!("from_{}", enum_data_type).as_str(), proc_macro2::Span::call_site());
+    let from_enum_data_type = syn::Ident::new(
+      format!("from_{}", enum_data_type).as_str(),
+      proc_macro2::Span::call_site(),
+    );
     quote::quote! {
       #lines
       let #name = #data_type::from_be_bytes(#name);

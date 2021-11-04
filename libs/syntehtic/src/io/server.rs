@@ -5,7 +5,7 @@ use std::net::SocketAddr;
 use tokio::net::TcpListener;
 use tokio_stream::StreamExt;
 use tokio_util::codec::Framed;
-use tracing::debug;
+use tracing::{debug, instrument};
 
 use crate::{
   codec::SyntheticFrameCodec,
@@ -24,6 +24,7 @@ pub struct Server {
 /// Represents a single connection to the server.
 impl Server {
   /// Starts a new server.
+  #[instrument]
   pub async fn run() -> Result<TcpListener, SyntheticError> {
     let listener = TcpListener::bind("0.0.0.0:9000").await?;
     // .expect(msg!("Failed to bind to port 9000"));
@@ -37,6 +38,7 @@ impl Server {
   }
 
   /// handles the connection
+  #[instrument]
   async fn handle(connection: Connection) -> Result<(), SyntheticError> {
     let mut framed = Framed::new(connection.stream, SyntheticFrameCodec::new());
     let mode = Mode::Unauthenticated;
