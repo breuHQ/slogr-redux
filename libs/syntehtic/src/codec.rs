@@ -1,7 +1,6 @@
 //! Synthtehtic codec
 use bytes::{Buf, BufMut, BytesMut};
 use tokio_util::codec::{Decoder, Encoder};
-use tracing::debug;
 
 use crate::{
   errors::SyntheticError,
@@ -24,7 +23,7 @@ impl Decoder for SyntheticFrameCodec {
   type Error = SyntheticError;
 
   fn decode(&mut self, src: &mut BytesMut) -> Result<Option<Self::Item>, Self::Error> {
-    // Not enough data to decode
+    // Not enough header bytes
     if src.len() < 2 {
       return Ok(None);
     }
@@ -33,6 +32,11 @@ impl Decoder for SyntheticFrameCodec {
     let mut delimiter: [u8; 2] = [0; 2];
     delimiter.copy_from_slice(&src[..2]);
     let size: usize = u16::from_be_bytes(delimiter) as usize;
+
+    // The entire frame has not arrived yet
+    if src.len() < size {
+      return Ok(None);
+    }
 
     // Get the payload
     let payload: Vec<u8> = src[2..(size + 2)].to_vec();
@@ -57,7 +61,6 @@ impl Encoder<SyntheticFrame> for SyntheticFrameCodec {
     match frame {
       SyntheticFrame::ServerGreeting(frame) => {
         let delimter: Vec<u8> = frame.get_delimiter();
-        debug!("Delimiter: {:?}", delimter);
         dst.reserve(2);
         dst.put(delimter.as_slice());
         dst.reserve(ServerGreetingFrame::SIZE);
@@ -66,7 +69,6 @@ impl Encoder<SyntheticFrame> for SyntheticFrameCodec {
       }
       SyntheticFrame::SetUpResponse(frame) => {
         let delimter: Vec<u8> = frame.get_delimiter();
-        debug!("Delimiter: {:?}", delimter);
         dst.reserve(2);
         dst.put(delimter.as_slice());
         dst.reserve(SetupResponseFrame::SIZE);
@@ -75,7 +77,6 @@ impl Encoder<SyntheticFrame> for SyntheticFrameCodec {
       }
       SyntheticFrame::ServerStart(frame) => {
         let delimter: Vec<u8> = frame.get_delimiter();
-        debug!("Delimiter: {:?}", delimter);
         dst.reserve(2);
         dst.put(delimter.as_slice());
         dst.reserve(ServerStartFrame::SIZE);
@@ -84,7 +85,6 @@ impl Encoder<SyntheticFrame> for SyntheticFrameCodec {
       }
       SyntheticFrame::RequestSession(frame) => {
         let delimter: Vec<u8> = frame.get_delimiter();
-        debug!("Delimiter: {:?}", delimter);
         dst.reserve(2);
         dst.put(delimter.as_slice());
         dst.reserve(RequestSessionFrame::SIZE);

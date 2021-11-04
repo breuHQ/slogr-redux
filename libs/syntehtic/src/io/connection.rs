@@ -3,7 +3,7 @@
 use std::net::SocketAddr;
 
 use tokio::{io::BufWriter, net::TcpStream};
-use tracing::info;
+use tracing::instrument;
 
 use crate::frames::Mode;
 
@@ -22,8 +22,8 @@ pub struct Connection {
 
 impl Connection {
   /// creates a new connection object
+  #[instrument]
   pub fn new(stream: TcpStream, addr: SocketAddr) -> Self {
-    info!("Established connection for: {:?}", addr);
     let stream = BufWriter::new(stream);
     let mode = Mode::Unauthenticated; // TODO: Get this from global configuration.
 

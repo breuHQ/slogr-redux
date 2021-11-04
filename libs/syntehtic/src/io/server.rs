@@ -5,7 +5,7 @@ use std::net::SocketAddr;
 use tokio::net::TcpListener;
 use tokio_stream::StreamExt;
 use tokio_util::codec::Framed;
-use tracing::{debug, instrument};
+use tracing::{info, instrument};
 
 use crate::{
   codec::SyntheticFrameCodec,
@@ -28,20 +28,22 @@ impl Server {
   pub async fn run() -> Result<TcpListener, SyntheticError> {
     let listener = TcpListener::bind("0.0.0.0:9000").await?;
     // .expect(msg!("Failed to bind to port 9000"));
-    debug!("Server started on port 9000");
+    info!("Server [LISTENING]: {:?}", listener.local_addr());
 
     loop {
       let (stream, addr) = listener.accept().await?;
       let connection = Connection::new(stream, addr);
-      tokio::spawn(Server::handle(connection));
+      tokio::task::spawn(Server::handle(connection));
     }
   }
 
   /// handles the connection
   #[instrument]
   async fn handle(connection: Connection) -> Result<(), SyntheticError> {
-    let mut framed = Framed::new(connection.stream, SyntheticFrameCodec::new());
     let mode = Mode::Unauthenticated;
+    info!("Connection [NEW]: {:?}", connection.addr);
+
+    let mut framed = Framed::new(connection.stream, SyntheticFrameCodec::new());
     framed
       .send(SyntheticFrame::ServerGreeting(ServerGreetingFrame::with_mode(mode)))
       .await?;
@@ -50,6 +52,7 @@ impl Server {
       .send(SyntheticFrame::SetUpResponse(SetupResponseFrame::with_mode(mode)))
       .await?;
 
+    // quick_concurrency_check(mode, &mut framed).await?;
     while let Some(message) = framed.next().await {
       match message {
         Ok(bytes) => println!("bytes: {:?}", bytes),
@@ -57,6 +60,23 @@ impl Server {
       }
     }
 
+    // TODO: Here we need to remove the connection from the list of connections.
+    info!("Connection [CLOSED] {:?}", connection.addr);
+
     Ok(())
   }
+}
+
+async fn _quick_concurrency_check(
+  mode: Mode,
+  framed: &mut Framed<tokio::io::BufWriter<tokio::net::TcpStream>, SyntheticFrameCodec>,
+) -> Result<(), SyntheticError> {
+  let mut frames: Vec<SyntheticFrame> = Vec::new();
+  for _ in 1..10000 {
+    frames.push(SyntheticFrame::ServerGreeting(ServerGreetingFrame::with_mode(mode)));
+    frames.push(SyntheticFrame::SetUpResponse(SetupResponseFrame::with_mode(mode)));
+  }
+  Ok(for frame in frames {
+    framed.send(frame).await?;
+  })
 }

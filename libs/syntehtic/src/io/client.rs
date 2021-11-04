@@ -23,9 +23,14 @@ impl Client {
     let stream = TcpStream::connect(addr).await?;
     let mut framed = SyntheticFrameCodec::new().framed(stream);
 
+    let mut count = 1;
+
     while let Some(frame) = framed.next().await {
       match frame {
-        Ok(f) => debug!("Recieved Frame: {:?}", f),
+        Ok(f) => {
+          debug!("Frame [{:?}]: {:?}", count, f);
+          count += 1;
+        }
         Err(err) => Err(err)?,
       }
     }
