@@ -32,7 +32,7 @@ pub struct ServerStartFrame {
   /// value.  (This way, the field could be used for future extensions.)
   /// Server-IV is generated randomly by the server.  In unauthenticated
   /// mode, Server-IV is unused.
-  pub mbz1: [u8; 15],
+  pub mbz_1: [u8; 15],
   /// The Accept field indicates the server's willingness to continue
   /// communication.  A zero value in the Accept field means that the
   /// server accepts the authentication and is willing to conduct further
@@ -63,5 +63,5 @@ pub struct ServerStartFrame {
   ///  value to each client in each session.
   pub start_time: [u8; 8],
   /// same as [`mbz1`]
-  pub mbz2: [u8; 8],
+  pub mbz_2: [u8; 8],
 }

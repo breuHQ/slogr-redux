@@ -213,7 +213,7 @@ pub struct RequestSessionFrame {
   ///  Descriptor.
   pub type_p_descriptor: u32,
   /// MBZ
-  pub mbz: u16,
+  pub mbz_2: u16,
   /// Since there are no Schedule Slot Descriptions, the Request-TW-Session
   /// message is completed by MBZ (Must Be Zero) and HMAC fields.  This
   /// completes one logical message, referred to as the Request-TW-Session

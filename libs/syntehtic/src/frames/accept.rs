@@ -19,7 +19,7 @@ use num_derive::FromPrimitive;
 ///  message receiver MUST interpret all values of Accept other than these
 ///  reserved values as 1.  This way, other values are available for
 ///  future extensions.
-#[derive(Debug, Clone, Copy, FromPrimitive)]
+#[derive(Debug, Clone, Copy, FromPrimitive, PartialEq, Eq)]
 pub enum Accept {
   /// Ok
   Ok = 0,
