@@ -31,6 +31,14 @@ pub enum SyntheticFrame {
   ServerStart(ServerStartFrame),
   /// represents request session frame
   RequestSession(RequestSessionFrame),
+  /// represents accept session frame
+  AcceptSession(AcceptSessionFrame),
+  /// represents start session frame
+  StartSession(StartSessionFrame),
+  /// represents start ack frame
+  StartAck(StartAckFrame),
+  /// represents stop session frame
+  StopSession(StopSessionFrame),
 }
 
 impl SyntheticFrame {

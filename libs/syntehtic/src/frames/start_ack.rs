@@ -34,7 +34,7 @@ use byteme::ByteMe;
 use crate::frames::Accept;
 
 /// Response to a Start-Sessions command.
-#[derive(Debug, PartialEq, Eq, ByteMe)]
+#[derive(Debug, PartialEq, Eq, ByteMe, Clone, Copy)]
 pub struct StartAckFrame {
   #[byte_me(u8)]
   /// The value of the Accept field.

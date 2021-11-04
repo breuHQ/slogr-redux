@@ -91,6 +91,38 @@ impl Encoder<SyntheticFrame> for SyntheticFrameCodec {
         dst.put(frame.to_bytes().as_slice());
         Ok(())
       }
+      SyntheticFrame::AcceptSession(frame) => {
+        let delimter: Vec<u8> = frame.get_delimiter();
+        dst.reserve(2);
+        dst.put(delimter.as_slice());
+        dst.reserve(ServerStartFrame::SIZE);
+        dst.put(frame.to_bytes().as_slice());
+        Ok(())
+      }
+      SyntheticFrame::StartSession(frame) => {
+        let delimter: Vec<u8> = frame.get_delimiter();
+        dst.reserve(2);
+        dst.put(delimter.as_slice());
+        dst.reserve(ServerStartFrame::SIZE);
+        dst.put(frame.to_bytes().as_slice());
+        Ok(())
+      }
+      SyntheticFrame::StartAck(frame) => {
+        let delimter: Vec<u8> = frame.get_delimiter();
+        dst.reserve(2);
+        dst.put(delimter.as_slice());
+        dst.reserve(ServerStartFrame::SIZE);
+        dst.put(frame.to_bytes().as_slice());
+        Ok(())
+      }
+      SyntheticFrame::StopSession(frame) => {
+        let delimter: Vec<u8> = frame.get_delimiter();
+        dst.reserve(2);
+        dst.put(delimter.as_slice());
+        dst.reserve(ServerStartFrame::SIZE);
+        dst.put(frame.to_bytes().as_slice());
+        Ok(())
+      }
     }
   }
 }

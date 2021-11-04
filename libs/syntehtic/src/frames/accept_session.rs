@@ -51,7 +51,7 @@ use byteme::ByteMe;
 use crate::frames::Accept;
 
 /// Respond to a Request-Session message with an Accept-Session message.
-#[derive(Debug, PartialEq, Eq, ByteMe)]
+#[derive(Debug, PartialEq, Eq, ByteMe, Clone, Copy)]
 pub struct AcceptSessionFrame {
   #[byte_me(u8)]
   /// The Accept field.

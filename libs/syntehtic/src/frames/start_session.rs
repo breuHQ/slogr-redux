@@ -22,7 +22,7 @@
 use byteme::ByteMe;
 
 /// Instructions for the server to start the test sessions.
-#[derive(Debug, PartialEq, ByteMe, Eq)]
+#[derive(Debug, PartialEq, ByteMe, Eq, Clone, Copy)]
 pub struct StartSessionFrame {
   /// ID of the session to start, hard coded to 2
   pub id: u8,
