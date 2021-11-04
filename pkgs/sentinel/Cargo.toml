@@ -15,9 +15,13 @@ tokio-util = {version = "0.6.8", features = ["full"]}
 tracing = {version = "0.1.29", default-features = false, features = ["attributes"]}
 tracing-subscriber = "0.2.25"
 criterion = "0.3"
+serde_yaml = "^0"
+serde = { version = "^1", features = ["derive"] }
+directories = "3.0.2"
 
 # sentinel related dependencies
 synthetic = { path = "../../libs/syntehtic" }
+
 
 
 
@@ -25,3 +29,7 @@ synthetic = { path = "../../libs/syntehtic" }
 name = "benchmark"
 path = "src/benchmark.rs"
 harness = false
+
+[[config]]
+name = "config"
+path = "config/config.rs"
