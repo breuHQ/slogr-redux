@@ -8,7 +8,7 @@ use tokio_util::codec::Framed;
 use tracing::{info, instrument};
 
 use crate::{
-  codec::SyntheticFrameCodec,
+  codec::SyntheticFrameCodecTCP,
   errors::SyntheticError,
   frames::{Mode, ServerGreetingFrame, SetupResponseFrame, SyntheticFrame},
   io::connection::Connection,
@@ -43,7 +43,7 @@ impl Server {
     let mode = Mode::Unauthenticated;
     info!("Connection [NEW]: {:?}", connection.addr);
 
-    let mut framed = Framed::new(connection.stream, SyntheticFrameCodec::new());
+    let mut framed = Framed::new(connection.stream, SyntheticFrameCodecTCP::new());
     framed
       .send(SyntheticFrame::ServerGreeting(ServerGreetingFrame::with_mode(mode)))
       .await?;
@@ -69,7 +69,7 @@ impl Server {
 
 async fn _quick_concurrency_check(
   mode: Mode,
-  framed: &mut Framed<tokio::io::BufWriter<tokio::net::TcpStream>, SyntheticFrameCodec>,
+  framed: &mut Framed<tokio::io::BufWriter<tokio::net::TcpStream>, SyntheticFrameCodecTCP>,
 ) -> Result<(), SyntheticError> {
   let mut frames: Vec<SyntheticFrame> = Vec::new();
   for _ in 1..10000 {

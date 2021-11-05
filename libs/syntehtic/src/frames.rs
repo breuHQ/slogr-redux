@@ -24,21 +24,21 @@ pub use self::{
 #[derive(Debug, Clone, Copy)]
 pub enum SyntheticFrame {
   /// represents the server greeting frame
-  ServerGreeting(ServerGreetingFrame),
+  ServerGreeting(ServerGreetingFrame), // 64 bytes
   /// represents the setup response frame
-  SetUpResponse(SetupResponseFrame),
+  SetUpResponse(SetupResponseFrame), // 164 bytes
   /// represent the server start frame
-  ServerStart(ServerStartFrame),
+  ServerStart(ServerStartFrame), // 48 Bytes
   /// represents request session frame
-  RequestSession(RequestSessionFrame),
+  RequestSession(RequestSessionFrame), // 96 bytes
   /// represents accept session frame
-  AcceptSession(AcceptSessionFrame),
+  AcceptSession(AcceptSessionFrame), // 48 bytes
   /// represents start session frame
-  StartSession(StartSessionFrame),
+  StartSession(StartSessionFrame), // 32 bytes
   /// represents start ack frame
-  StartAck(StartAckFrame),
+  StartAck(StartAckFrame), // 32 bytes
   /// represents stop session frame
-  StopSession(StopSessionFrame),
+  StopSession(StopSessionFrame), // 32 bytes
 }
 
 impl SyntheticFrame {
@@ -50,6 +50,10 @@ impl SyntheticFrame {
       SetupResponseFrame::SIZE => Ok(Self::SetUpResponse(SetupResponseFrame::from_bytes(bytes))),
       ServerStartFrame::SIZE => Ok(Self::ServerStart(ServerStartFrame::from_bytes(bytes))),
       RequestSessionFrame::SIZE => Ok(Self::RequestSession(RequestSessionFrame::from_bytes(bytes))),
+      AcceptSessionFrame::SIZE => Ok(Self::AcceptSession(AcceptSessionFrame::from_bytes(bytes))),
+      StartSessionFrame::SIZE => Ok(Self::StartSession(StartSessionFrame::from_bytes(bytes))),
+      StartAckFrame::SIZE => Ok(Self::StartAck(StartAckFrame::from_bytes(bytes))),
+      StopSessionFrame::SIZE => Ok(Self::StopSession(StopSessionFrame::from_bytes(bytes))),
       _ => Err(SyntheticError::IllegalFrame),
     }
   }

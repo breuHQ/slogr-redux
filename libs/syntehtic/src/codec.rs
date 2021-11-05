@@ -9,16 +9,16 @@ use crate::{
 
 /// Codec for [SyntehticFrame]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
-pub struct SyntheticFrameCodec(());
+pub struct SyntheticFrameCodecTCP(());
 
-impl SyntheticFrameCodec {
+impl SyntheticFrameCodecTCP {
   /// Creates a new instance of the codec
   pub fn new() -> Self {
-    SyntheticFrameCodec(())
+    SyntheticFrameCodecTCP(())
   }
 }
 
-impl Decoder for SyntheticFrameCodec {
+impl Decoder for SyntheticFrameCodecTCP {
   type Item = SyntheticFrame;
   type Error = SyntheticError;
 
@@ -54,7 +54,7 @@ impl Decoder for SyntheticFrameCodec {
   }
 }
 
-impl Encoder<SyntheticFrame> for SyntheticFrameCodec {
+impl Encoder<SyntheticFrame> for SyntheticFrameCodecTCP {
   type Error = SyntheticError;
 
   fn encode(&mut self, frame: SyntheticFrame, dst: &mut BytesMut) -> Result<(), Self::Error> {
