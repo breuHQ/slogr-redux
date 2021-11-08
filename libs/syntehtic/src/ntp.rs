@@ -1,5 +1,4 @@
 //! DateTime for NTP
-use byteme::ByteMe;
 use chrono::DateTime;
 use chrono::Utc;
 use chrono::{TimeZone, Timelike};
@@ -99,5 +98,13 @@ mod tests {
     let now_again = DateTime::from(ntp_timestamp);
 
     assert_ne!(now, now_again);
+  }
+
+  #[test]
+  fn ntp_to_u64() {
+    let now = NtpTimestamp::now();
+    let number: u64 = u64::from(now);
+    let now_again = NtpTimestamp::from(number);
+    assert_eq!(now, now_again);
   }
 }
