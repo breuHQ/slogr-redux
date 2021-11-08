@@ -31,6 +31,9 @@ use byteme::ByteMe;
 ///   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 /// ```
 ///
+/// # Example
+/// ```
+/// ```
 /// Salt and Count are parameters used in deriving a key from a shared
 /// secret as described below.
 ///

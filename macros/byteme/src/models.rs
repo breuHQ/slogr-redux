@@ -14,8 +14,8 @@ impl syn::parse::Parse for ByteMeStruct {
     let strukt = input.parse::<syn::ItemStruct>()?;
     let ident = strukt.ident.clone();
     let mut fields: Vec<ByteMeField> = Vec::new();
-    for f in strukt.fields {
-      let field = ByteMeField::try_from(&f)?;
+    for field in strukt.fields {
+      let field = ByteMeField::try_from(&field)?;
       fields.push(field);
     }
     Ok(Self { ident, fields })
@@ -57,19 +57,20 @@ impl TryFrom<&syn::Field> for ByteMeField {
 
     let attribute = attrs_ref.iter().find(|attr| attr.path.is_ident("byte_me"));
 
-    let attribute = if attribute.is_some() {
-      let meta: syn::Meta = attribute.unwrap().parse_args().unwrap();
-      let segments = meta.path().clone().segments;
-      if segments.len() != 1 {
-        return Err(syn::Error::new_spanned(
-          field.into_token_stream(),
-          "`byte_me` attribute can only have one argument",
-        ));
-      } else {
-        Some(segments.into_iter().next().unwrap().ident)
+    let attribute = match attribute {
+      Some(attribute) => {
+        let meta: syn::Meta = attribute.parse_args().unwrap();
+        let segments = meta.path().clone().segments;
+        if segments.len() != 1 {
+          return Err(syn::Error::new_spanned(
+            field.into_token_stream(),
+            "`byte_me` attribute can only have one argument",
+          ));
+        } else {
+          Some(segments.into_iter().next().unwrap().ident)
+        }
       }
-    } else {
-      None
+      None => None,
     };
 
     let field_type = field.ty.clone();
@@ -107,7 +108,7 @@ impl TryFrom<&syn::Field> for ByteMeField {
           })
         },
         // Check for the custom field type (can be a struct or enum) with a `#[byte_me($type)]`
-        // where type can only be a positive integer. Right now we are only assume that it is an enum
+        // where type can only be a positive integer. Right now we are only assuming that it is an enum
         //
         // TODO: Add support for custom structs
         syn::Type::Path(syn::TypePath {path, ..}) if attribute.is_some() => {

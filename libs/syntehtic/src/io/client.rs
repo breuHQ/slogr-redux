@@ -7,7 +7,7 @@ use tokio_stream::StreamExt;
 use tokio_util::codec::Decoder;
 use tracing::debug;
 
-use crate::{codec::SyntheticFrameCodecTCP, errors::SyntheticError, io::connection::Connection};
+use crate::{codec::SyntheticFrameTCPCodec, errors::SyntheticError, io::connection::Connection};
 
 /// Serves as a container for the client connection.
 #[derive(Debug)]
@@ -21,7 +21,7 @@ impl Client {
   pub async fn connect() -> Result<(), SyntheticError> {
     let addr = "127.0.0.1:9000".parse::<SocketAddr>().unwrap();
     let stream = TcpStream::connect(addr).await?;
-    let mut framed = SyntheticFrameCodecTCP::new().framed(stream);
+    let mut framed = SyntheticFrameTCPCodec::new().framed(stream);
 
     let mut count = 1;
 
@@ -31,7 +31,7 @@ impl Client {
           debug!("Frame [{:?}]: {:?}", count, f);
           count += 1;
         }
-        Err(err) => Err(err)?,
+        Err(err) => return Err(err),
       }
     }
     Ok(())

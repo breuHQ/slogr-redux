@@ -119,6 +119,7 @@ pub mod codec;
 pub mod errors;
 #[warn(missing_debug_implementations, missing_docs)]
 pub mod frames;
-
 #[warn(missing_debug_implementations, missing_docs)]
 pub mod io;
+#[warn(missing_debug_implementations, missing_docs)]
+pub mod ntp;

@@ -2,23 +2,37 @@
 use bytes::{Buf, BufMut, BytesMut};
 use tokio_util::codec::{Decoder, Encoder};
 
+/// Macro for writing frame to destination
+macro_rules! write_frame {
+  ($frame: expr, $dst: expr, $size: expr) => {{
+    $dst.reserve(2);
+    $dst.put($frame.get_delimiter().as_slice());
+    $dst.reserve($size);
+    $dst.put($frame.to_bytes().as_slice());
+    Ok(())
+  }};
+}
+
 use crate::{
   errors::SyntheticError,
-  frames::{RequestSessionFrame, ServerGreetingFrame, ServerStartFrame, SetupResponseFrame, SyntheticFrame},
+  frames::{
+    self, AcceptSessionFrame, RequestSessionFrame, ServerGreetingFrame, ServerStartFrame, SetupResponseFrame,
+    StartSessionFrame, SyntheticFrame,
+  },
 };
 
 /// Codec for [SyntehticFrame]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
-pub struct SyntheticFrameCodecTCP(());
+pub struct SyntheticFrameTCPCodec(());
 
-impl SyntheticFrameCodecTCP {
+impl SyntheticFrameTCPCodec {
   /// Creates a new instance of the codec
   pub fn new() -> Self {
-    SyntheticFrameCodecTCP(())
+    SyntheticFrameTCPCodec(())
   }
 }
 
-impl Decoder for SyntheticFrameCodecTCP {
+impl Decoder for SyntheticFrameTCPCodec {
   type Item = SyntheticFrame;
   type Error = SyntheticError;
 
@@ -54,75 +68,19 @@ impl Decoder for SyntheticFrameCodecTCP {
   }
 }
 
-impl Encoder<SyntheticFrame> for SyntheticFrameCodecTCP {
+impl Encoder<SyntheticFrame> for SyntheticFrameTCPCodec {
   type Error = SyntheticError;
 
   fn encode(&mut self, frame: SyntheticFrame, dst: &mut BytesMut) -> Result<(), Self::Error> {
     match frame {
-      SyntheticFrame::ServerGreeting(frame) => {
-        let delimter: Vec<u8> = frame.get_delimiter();
-        dst.reserve(2);
-        dst.put(delimter.as_slice());
-        dst.reserve(ServerGreetingFrame::SIZE);
-        dst.put(frame.to_bytes().as_slice());
-        Ok(())
-      }
-      SyntheticFrame::SetUpResponse(frame) => {
-        let delimter: Vec<u8> = frame.get_delimiter();
-        dst.reserve(2);
-        dst.put(delimter.as_slice());
-        dst.reserve(SetupResponseFrame::SIZE);
-        dst.put(frame.to_bytes().as_slice());
-        Ok(())
-      }
-      SyntheticFrame::ServerStart(frame) => {
-        let delimter: Vec<u8> = frame.get_delimiter();
-        dst.reserve(2);
-        dst.put(delimter.as_slice());
-        dst.reserve(ServerStartFrame::SIZE);
-        dst.put(frame.to_bytes().as_slice());
-        Ok(())
-      }
-      SyntheticFrame::RequestSession(frame) => {
-        let delimter: Vec<u8> = frame.get_delimiter();
-        dst.reserve(2);
-        dst.put(delimter.as_slice());
-        dst.reserve(RequestSessionFrame::SIZE);
-        dst.put(frame.to_bytes().as_slice());
-        Ok(())
-      }
-      SyntheticFrame::AcceptSession(frame) => {
-        let delimter: Vec<u8> = frame.get_delimiter();
-        dst.reserve(2);
-        dst.put(delimter.as_slice());
-        dst.reserve(ServerStartFrame::SIZE);
-        dst.put(frame.to_bytes().as_slice());
-        Ok(())
-      }
-      SyntheticFrame::StartSession(frame) => {
-        let delimter: Vec<u8> = frame.get_delimiter();
-        dst.reserve(2);
-        dst.put(delimter.as_slice());
-        dst.reserve(ServerStartFrame::SIZE);
-        dst.put(frame.to_bytes().as_slice());
-        Ok(())
-      }
-      SyntheticFrame::StartAck(frame) => {
-        let delimter: Vec<u8> = frame.get_delimiter();
-        dst.reserve(2);
-        dst.put(delimter.as_slice());
-        dst.reserve(ServerStartFrame::SIZE);
-        dst.put(frame.to_bytes().as_slice());
-        Ok(())
-      }
-      SyntheticFrame::StopSession(frame) => {
-        let delimter: Vec<u8> = frame.get_delimiter();
-        dst.reserve(2);
-        dst.put(delimter.as_slice());
-        dst.reserve(ServerStartFrame::SIZE);
-        dst.put(frame.to_bytes().as_slice());
-        Ok(())
-      }
+      SyntheticFrame::ServerGreeting(frame) => write_frame!(frame, dst, ServerGreetingFrame::SIZE),
+      SyntheticFrame::SetUpResponse(frame) => write_frame!(frame, dst, SetupResponseFrame::SIZE),
+      SyntheticFrame::ServerStart(frame) => write_frame!(frame, dst, ServerStartFrame::SIZE),
+      SyntheticFrame::RequestSession(frame) => write_frame!(frame, dst, RequestSessionFrame::SIZE),
+      SyntheticFrame::AcceptSession(frame) => write_frame!(frame, dst, AcceptSessionFrame::SIZE),
+      SyntheticFrame::StartSession(frame) => write_frame!(frame, dst, StartSessionFrame::SIZE),
+      SyntheticFrame::StartAck(frame) => write_frame!(frame, dst, frames::StartAckFrame::SIZE),
+      SyntheticFrame::StopSession(frame) => write_frame!(frame, dst, frames::StopSessionFrame::SIZE),
     }
   }
 }

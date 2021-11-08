@@ -53,15 +53,23 @@ pub struct ServerStartFrame {
   /// instantiation of the server started operating.  (For example, in a
   /// multi-user general purpose operating system, it could be the time
   /// when the server process was started.)  If Accept is non-zero, Start-
-  ///  Time SHOULD be set so that all of its bits are zeros.  In
-  ///  authenticated and encrypted modes, Start-Time is encrypted as
-  ///  described in Section 3.4, "OWAMP-Control Commands", unless Accept is
-  ///  non-zero.  (Authenticated and encrypted mode cannot be entered unless
-  ///  the control connection can be initialized.)
-  ///  Timestamp format is described in Section 4.1.2.  The same
-  ///  instantiation of the server SHOULD report the same exact Start-Time
-  ///  value to each client in each session.
-  pub start_time: [u8; 8],
+  /// Time SHOULD be set so that all of its bits are zeros.  In
+  /// authenticated and encrypted modes, Start-Time is encrypted as
+  /// described in Section 3.4, "OWAMP-Control Commands", unless Accept is
+  /// non-zero.  (Authenticated and encrypted mode cannot be entered unless
+  /// the control connection can be initialized.)
+  /// Timestamp format is described in Section 4.1.2.  The same
+  /// instantiation of the server SHOULD report the same exact Start-Time
+  /// value to each client in each session.
+  ///
+  /// ## Summary
+  /// The timpestamp is a 64-bit unsigned integer representing the number of
+  /// seconds since the PRIME epoch (00:00:00 UTC, January 1, 1900). The first
+  /// 32 bits represent the number of seconds since the PRIME epoch (00:00:00
+  /// UTC, January 1, 1900). The last 32 bits represent the fractions. See
+  /// more at https://en.wikipedia.org/wiki/Network_Time_Protocol
+  ///
+  pub start_time: u64,
   /// same as [`mbz1`]
   pub mbz_2: [u8; 8],
 }
