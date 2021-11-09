@@ -1,7 +1,8 @@
 use super::Mode;
 use byteme::ByteMe;
 
-/// The client MUST respond with the following Set-Up-Response message:
+/// The client MUST respond with the following Set-Up-Response message to
+/// Server-Greeting message.:
 ///
 /// ```text
 ///    0                   1                   2                   3

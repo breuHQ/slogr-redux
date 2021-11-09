@@ -2,6 +2,7 @@
 use futures::sink::SinkExt;
 use std::net::SocketAddr;
 
+use eyre::Result;
 use tokio::net::TcpListener;
 use tokio_stream::StreamExt;
 use tokio_util::codec::Framed;
@@ -49,15 +50,11 @@ impl Server {
     framed
       .send(SyntheticFrame::ServerGreeting(ServerGreetingFrame::with_mode(mode)))
       .await?;
-    // I should be able to different frames and get it decoded.
-    framed
-      .send(SyntheticFrame::SetUpResponse(SetupResponseFrame::with_mode(mode)))
-      .await?;
 
     // _quick_concurrency_check(mode, &mut framed).await?;
     while let Some(message) = framed.next().await {
       match message {
-        Ok(bytes) => println!("bytes: {:?}", bytes),
+        Ok(bytes) => println!("frame: {:?}", bytes),
         Err(err) => return Err(err),
       }
     }

@@ -1,17 +1,7 @@
 //! Synthtehtic codec
 use bytes::{Buf, BufMut, BytesMut};
+use eyre::Result;
 use tokio_util::codec::{Decoder, Encoder};
-
-/// Macro for writing frame to destination
-macro_rules! write_frame {
-  ($frame: expr, $dst: expr, $size: expr) => {{
-    $dst.reserve(2);
-    $dst.put($frame.get_delimiter().as_slice());
-    $dst.reserve($size);
-    $dst.put($frame.to_bytes().as_slice());
-    Ok(())
-  }};
-}
 
 use crate::{
   errors::SyntheticError,
@@ -19,6 +9,7 @@ use crate::{
     self, AcceptSessionFrame, RequestSessionFrame, ServerGreetingFrame, ServerStartFrame, SetupResponseFrame,
     StartSessionFrame, SyntheticFrame,
   },
+  macros::write_frame,
 };
 
 /// Codec for [SyntehticFrame]

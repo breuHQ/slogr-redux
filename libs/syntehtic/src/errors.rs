@@ -28,6 +28,10 @@ pub enum SyntheticError {
   #[error("Invalid or empty frame")]
   IllegalFrame,
 
+  /// Connection was closed due to timeout
+  #[error("Connection timeout")]
+  ConnectionTimeout,
+
   /// transparently communicating back errors
   #[error(transparent)]
   IOError(#[from] std::io::Error),

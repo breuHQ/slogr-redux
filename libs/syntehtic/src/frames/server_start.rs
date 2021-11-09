@@ -1,4 +1,5 @@
 use super::Accept;
+use crate::ntp::NtpTimestamp;
 use byteme::ByteMe;
 /// The server MUST respond with the following Server-Start message:
 /// ```text
@@ -72,4 +73,18 @@ pub struct ServerStartFrame {
   pub start_time: u64,
   /// same as [`mbz1`]
   pub mbz_2: [u8; 8],
+}
+
+impl ServerStartFrame {
+  /// Get the ServerStartFrame for unauthenticated mode
+  pub fn unauthenticated(accept: Accept) -> Self {
+    let start_time: u64 = u64::from(NtpTimestamp::now());
+    Self {
+      mbz_1: [0; 15],
+      accept,
+      server_iv: [0; 16],
+      start_time,
+      mbz_2: [0; 8],
+    }
+  }
 }

@@ -13,6 +13,7 @@ mod start_session;
 mod stop_session;
 
 use crate::errors::SyntheticError;
+use eyre::Result;
 
 pub use self::{
   accept::Accept, accept_session::AcceptSessionFrame, ipvn::IpVn, mode::Mode, request_session::RequestSessionFrame,

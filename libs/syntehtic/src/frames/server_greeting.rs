@@ -1,4 +1,4 @@
-use super::Mode;
+use super::{Mode, SetupResponseFrame};
 use byteme::ByteMe;
 
 ///   The server greeting frame required for connection handshake.
@@ -75,5 +75,10 @@ impl ServerGreetingFrame {
       count: 1024,
       mbz: [0; 12],
     }
+  }
+
+  /// Generates the response for the given server greeting frame
+  pub fn generate_response(&self) -> SetupResponseFrame {
+    SetupResponseFrame::with_mode(self.mode)
   }
 }

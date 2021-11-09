@@ -123,3 +123,6 @@ pub mod frames;
 pub mod io;
 #[warn(missing_debug_implementations, missing_docs)]
 pub mod ntp;
+
+#[warn(missing_debug_implementations, missing_docs)]
+pub mod macros;
