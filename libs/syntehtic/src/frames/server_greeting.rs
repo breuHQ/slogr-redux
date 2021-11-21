@@ -82,3 +82,12 @@ impl ServerGreetingFrame {
     SetupResponseFrame::with_mode(self.mode)
   }
 }
+
+#[cfg(test)]
+mod tests {
+  #[test]
+  fn test_into() {}
+
+  #[test]
+  fn test_from() {}
+}

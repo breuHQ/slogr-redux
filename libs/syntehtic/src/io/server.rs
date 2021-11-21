@@ -52,6 +52,7 @@ impl Server {
       .await?;
 
     // _quick_concurrency_check(mode, &mut framed).await?;
+
     while let Some(message) = framed.next().await {
       match message {
         Ok(bytes) => println!("frame: {:?}", bytes),
@@ -68,7 +69,7 @@ impl Server {
 
 async fn _quick_concurrency_check(
   mode: Mode,
-  framed: &mut Framed<tokio::io::BufWriter<tokio::net::TcpStream>, SyntheticFrameTCPCodec>,
+  stream: &mut Framed<tokio::io::BufWriter<tokio::net::TcpStream>, SyntheticFrameTCPCodec>,
 ) -> Result<(), SyntheticError> {
   let mut frames: Vec<SyntheticFrame> = Vec::new();
   for _ in 1..10000 {
@@ -76,7 +77,7 @@ async fn _quick_concurrency_check(
     frames.push(SyntheticFrame::SetUpResponse(SetupResponseFrame::with_mode(mode)));
   }
   for frame in frames {
-    framed.send(frame).await?;
+    stream.send(frame).await?;
   }
   Ok(())
 }

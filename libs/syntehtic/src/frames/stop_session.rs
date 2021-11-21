@@ -48,7 +48,6 @@
 //!    Upon receipt of a TWAMP-Control Stop-Sessions command, the Session-
 //!    Reflector MUST discard any TWAMP-Test packets that arrive at the
 //!    current time plus the Timeout (in the Request-TW-Session command).
-
 use byteme::ByteMe;
 
 use crate::frames::Accept;
@@ -69,4 +68,13 @@ pub struct StopSessionFrame {
   pub mbz_2: [u8; 8],
   /// HMAC.
   pub hmac: [u8; 16],
+}
+
+#[cfg(test)]
+mod tests {
+  #[test]
+  fn test_into() {}
+
+  #[test]
+  fn test_from() {}
 }

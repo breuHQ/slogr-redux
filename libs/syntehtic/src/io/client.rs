@@ -1,15 +1,19 @@
 //! Client side of the synthetic I/O.
 
-use std::net::SocketAddr;
+use futures::{Future, SinkExt};
+use std::{net::SocketAddr, pin::Pin};
 
 use eyre::Result;
-use futures::SinkExt;
 use tokio_stream::StreamExt;
 use tokio_util::codec::Decoder;
 
 use crate::{
   codec::SyntheticFrameTCPCodec, errors::SyntheticError, frames::SyntheticFrame, io::connection::Connection,
 };
+
+// ysf: reducing the cognitive load on the type
+type FramedStream = Result<SyntheticFrame, SyntheticError>;
+type TimedFramedStream = Result<Option<FramedStream>, tokio::time::error::Elapsed>;
 
 /// Serves as a container for the client connection.
 #[derive(Debug)]
@@ -21,13 +25,14 @@ pub struct Client {
 impl Client {
   /// connect to a given address
   pub async fn connect() -> Result<(), SyntheticError> {
-    let duration = tokio::time::Duration::from_secs(120);
+    let timeout_strategy = tokio::time::Duration::from_secs(120);
     let addr = "127.0.0.1:9000".parse::<SocketAddr>().unwrap();
     let stream = tokio::net::TcpStream::connect(addr).await?;
     let mut stream = SyntheticFrameTCPCodec::new().framed(stream);
-    let timeout = tokio::time::timeout(duration, stream.next());
+    let stream_with_timeout = tokio::time::timeout(timeout_strategy, stream.next());
+    let pinned_stream: Pin<Box<dyn Future<Output = TimedFramedStream>>> = Box::pin(stream_with_timeout);
 
-    if let Ok(Some(response)) = timeout.await {
+    if let Ok(Some(response)) = pinned_stream.await {
       Client::process_server_greeting_frame(response, stream).await?;
     }
 

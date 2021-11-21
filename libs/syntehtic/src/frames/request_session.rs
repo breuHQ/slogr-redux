@@ -220,3 +220,12 @@ pub struct RequestSessionFrame {
   /// command.
   pub hmac: [u8; 16],
 }
+
+#[cfg(test)]
+mod tests {
+  #[test]
+  fn test_into() {}
+
+  #[test]
+  fn test_from() {}
+}

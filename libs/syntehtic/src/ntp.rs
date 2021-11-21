@@ -15,9 +15,6 @@ pub struct NtpTimestamp {
   pub fraction: u32,
 }
 
-/// Basic implentation. Taken from
-/// Converts a NTP timestamp to a DateTime
-/// https://books.google.com.pk/books?id=x1w4EAAAQBAJ&pg=PA319&lpg=PA319&dq=impl+From%3CNtpTimeStamp%3E+for+DateTime%3CUtc%3E+rust&source=bl&ots=O0MEZZr9fH&sig=ACfU3U1KkmXgxHkjc44EQ1CL1ayo6EqwJA&hl=en&sa=X&ved=2ahUKEwjnzLDLk4f0AhVSRBoKHdkSBUIQ6AF6BAgZEAM#v=onepage&q&f=false
 impl From<NtpTimestamp> for DateTime<Utc> {
   fn from(ntp_timestamp: NtpTimestamp) -> Self {
     let seconds = ntp_timestamp.seconds as i64 - PRIME_EPOCH_DELTA as i64;
@@ -85,8 +82,8 @@ mod tests {
       seconds: 15_848_988,
       fraction: 19_800_911,
     };
-    let utc: DateTime<Utc> = DateTime::from(now);
-    let now_again = NtpTimestamp::from(utc);
+    let utc: DateTime<Utc> = now.into();
+    let now_again: NtpTimestamp = utc.into();
 
     assert_ne!(now, now_again);
   }
@@ -94,8 +91,8 @@ mod tests {
   #[test]
   fn utc_to_ntp() {
     let now = Utc::now();
-    let ntp_timestamp: NtpTimestamp = NtpTimestamp::from(now);
-    let now_again = DateTime::from(ntp_timestamp);
+    let ntp_timestamp: NtpTimestamp = now.into();
+    let now_again = ntp_timestamp.into();
 
     assert_ne!(now, now_again);
   }
@@ -103,8 +100,8 @@ mod tests {
   #[test]
   fn ntp_to_u64() {
     let now = NtpTimestamp::now();
-    let number: u64 = u64::from(now);
-    let now_again = NtpTimestamp::from(number);
+    let number: u64 = now.into();
+    let now_again = number.into();
     assert_eq!(now, now_again);
   }
 }
