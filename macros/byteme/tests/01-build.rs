@@ -31,8 +31,8 @@ fn main() {
     mbz: [0; 12],
   };
 
-  let bytes = frame.to_bytes();
-  let result = FrameOne::from_bytes(bytes);
+  let bytes: Vec<u8> = frame.into();
+  let result: FrameOne = bytes.into();
 
   assert_eq!(result, frame);
 }

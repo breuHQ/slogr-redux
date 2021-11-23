@@ -48,18 +48,14 @@ pub fn derive(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
       /// Size of the struct in bytes
       pub const SIZE: usize = #size;
 
-      /// Convert the struct to a byte array.
-      pub fn to_bytes(&self) -> Vec<u8> {
-        let mut bytes = Vec::new();
-        #(#fn_lines_to_bytes)*
-        bytes
+      /// Gets the delimiter as a vector of bytes.
+      pub fn get_delimiter(self) -> Vec<u8> {
+        (Self::SIZE as u16).to_be_bytes().to_vec()
       }
+    }
 
-      /// Convert the byte array to a struct.
-      pub fn from_bytes(bytes: Vec<u8>) -> Self {
-        // This import from the `num-traits` crate is required to use the `FromPrimitive` trait.
-        // If the field is an enum, or any of the positive integer types, we quickly get the required
-        // value from a [u8] array.
+    impl From<Vec<u8>> for #name {
+      fn from(bytes: Vec<u8>) -> Self {
         use num_traits::FromPrimitive;
         // Converting `[u8]` to fields based on their length.
         #(#fn_line_from_bytes)*
@@ -68,11 +64,14 @@ pub fn derive(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
           #(#fields)*
         }
       }
+    }
 
-      /// Gets the delimiter as a vector of bytes.
-      pub fn get_delimiter(self) -> Vec<u8> {
-        (Self::SIZE as u16).to_be_bytes().to_vec()
-      }
+    impl From<#name> for Vec<u8> {
+     fn from(d: #name) -> Self {
+        let mut bytes = Vec::new();
+        #(#fn_lines_to_bytes)*
+        bytes
+     } 
     }
   };
 
@@ -86,11 +85,11 @@ fn to_bytes_fn_factory(field: &ByteMeField) -> proc_macro2::TokenStream {
 
   if field.is_array {
     quote::quote! {
-      bytes.extend_from_slice(&(self.#name));
+      bytes.extend_from_slice(&(d.#name));
     }
   } else {
     quote::quote! {
-      bytes.extend_from_slice(&(self.#name as #data_type).to_be_bytes().to_vec());
+      bytes.extend_from_slice(&(d.#name as #data_type).to_be_bytes().to_vec());
     }
   }
 }

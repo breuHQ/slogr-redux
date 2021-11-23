@@ -2,6 +2,8 @@
 
 use futures::{Future, SinkExt};
 use std::{net::SocketAddr, pin::Pin};
+use tokio::net::TcpStream;
+use tracing::info;
 
 use eyre::Result;
 use tokio_stream::StreamExt;
@@ -28,30 +30,44 @@ impl Client {
     let timeout_strategy = tokio::time::Duration::from_secs(120);
     let addr = "127.0.0.1:9000".parse::<SocketAddr>().unwrap();
     let stream = tokio::net::TcpStream::connect(addr).await?;
+    info!("Connected: {}", addr);
     let mut stream = SyntheticFrameTCPCodec::new().framed(stream);
     let stream_with_timeout = tokio::time::timeout(timeout_strategy, stream.next());
     let pinned_stream: Pin<Box<dyn Future<Output = TimedFramedStream>>> = Box::pin(stream_with_timeout);
 
     if let Ok(Some(response)) = pinned_stream.await {
-      Client::process_server_greeting_frame(response, stream).await?;
+      Client::handle(response, stream).await?;
     }
 
     Ok(())
   }
 
-  async fn process_server_greeting_frame(
+  async fn handle(
     response: Result<SyntheticFrame, SyntheticError>,
     mut stream: tokio_util::codec::Framed<tokio::net::TcpStream, SyntheticFrameTCPCodec>,
   ) -> Result<(), SyntheticError> {
     match response {
-      Ok(frame) => {
-        if let SyntheticFrame::ServerGreeting(greeting) = frame {
-          stream
-            .send(SyntheticFrame::SetUpResponse(greeting.generate_response()))
-            .await?
-        } else {
-          return Err(SyntheticError::UnexpectedFrame);
+      Ok(response_frame) => {
+        // ysf: this should be `response.reply(stream).await?`.
+        match response_frame {
+          SyntheticFrame::ServerGreeting(frame) => {
+            stream.send(SyntheticFrame::SetUpResponse(frame.get_reply())).await?
+          }
+          SyntheticFrame::SetUpResponse(_) => todo!(),
+          SyntheticFrame::ServerStart(_) => todo!(),
+          SyntheticFrame::RequestSession(_) => todo!(),
+          SyntheticFrame::AcceptSession(_) => todo!(),
+          SyntheticFrame::StartSession(_) => todo!(),
+          SyntheticFrame::StartAck(_) => todo!(),
+          SyntheticFrame::StopSession(_) => todo!(),
         }
+        // if let SyntheticFrame::ServerGreeting(greeting) = frame {
+        //   stream
+        //     .send(SyntheticFrame::SetUpResponse(greeting.generate_response()))
+        //     .await?
+        // } else {
+        //   return Err(SyntheticError::UnexpectedFrame);
+        // }
       }
       Err(err) => return Err(err),
     };

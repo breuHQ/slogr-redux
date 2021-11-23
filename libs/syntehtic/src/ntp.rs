@@ -15,6 +15,7 @@ pub struct NtpTimestamp {
   pub fraction: u32,
 }
 
+/// Converts an NtpTimestamp to a UTC Date
 impl From<NtpTimestamp> for DateTime<Utc> {
   fn from(ntp_timestamp: NtpTimestamp) -> Self {
     let seconds = ntp_timestamp.seconds as i64 - PRIME_EPOCH_DELTA as i64;

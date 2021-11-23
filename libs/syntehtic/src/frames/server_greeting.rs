@@ -77,8 +77,8 @@ impl ServerGreetingFrame {
     }
   }
 
-  /// Generates the response for the given server greeting frame
-  pub fn generate_response(&self) -> SetupResponseFrame {
+  /// Given the
+  pub fn get_reply(&self) -> SetupResponseFrame {
     SetupResponseFrame::with_mode(self.mode)
   }
 }

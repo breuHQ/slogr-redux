@@ -29,4 +29,9 @@ impl Connection {
 
     Self { stream, addr, mode }
   }
+
+  /// upgrade the stream to
+  pub fn upgrade(&self) -> Self {
+    todo!()
+  }
 }

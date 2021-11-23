@@ -47,14 +47,14 @@ impl SyntheticFrame {
   pub fn try_from_bytes(bytes: Vec<u8>) -> Result<Self, SyntheticError> {
     let size = bytes.len();
     match size {
-      ServerGreetingFrame::SIZE => Ok(Self::ServerGreeting(ServerGreetingFrame::from_bytes(bytes))),
-      SetupResponseFrame::SIZE => Ok(Self::SetUpResponse(SetupResponseFrame::from_bytes(bytes))),
-      ServerStartFrame::SIZE => Ok(Self::ServerStart(ServerStartFrame::from_bytes(bytes))),
-      RequestSessionFrame::SIZE => Ok(Self::RequestSession(RequestSessionFrame::from_bytes(bytes))),
-      AcceptSessionFrame::SIZE => Ok(Self::AcceptSession(AcceptSessionFrame::from_bytes(bytes))),
-      StartSessionFrame::SIZE => Ok(Self::StartSession(StartSessionFrame::from_bytes(bytes))),
-      StartAckFrame::SIZE => Ok(Self::StartAck(StartAckFrame::from_bytes(bytes))),
-      StopSessionFrame::SIZE => Ok(Self::StopSession(StopSessionFrame::from_bytes(bytes))),
+      ServerGreetingFrame::SIZE => Ok(Self::ServerGreeting(bytes.into())),
+      SetupResponseFrame::SIZE => Ok(Self::SetUpResponse(bytes.into())),
+      ServerStartFrame::SIZE => Ok(Self::ServerStart(bytes.into())),
+      RequestSessionFrame::SIZE => Ok(Self::RequestSession(bytes.into())),
+      AcceptSessionFrame::SIZE => Ok(Self::AcceptSession(bytes.into())),
+      StartSessionFrame::SIZE => Ok(Self::StartSession(bytes.into())),
+      StartAckFrame::SIZE => Ok(Self::StartAck(bytes.into())),
+      StopSessionFrame::SIZE => Ok(Self::StopSession(bytes.into())),
       _ => Err(SyntheticError::IllegalFrame),
     }
   }

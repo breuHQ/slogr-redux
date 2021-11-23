@@ -6,7 +6,8 @@ macro_rules! write_frame {
     $dst.reserve(2);
     $dst.put($frame.get_delimiter().as_slice());
     $dst.reserve($size);
-    $dst.put($frame.to_bytes().as_slice());
+    let d: Vec<u8> = $frame.into();
+    $dst.put(d.as_slice());
     Ok(())
   }};
 }
