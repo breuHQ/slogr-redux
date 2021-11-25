@@ -1,3 +1,5 @@
+use crate::frames::Reply;
+
 use super::{Mode, SetupResponseFrame};
 use byteme::ByteMe;
 
@@ -66,20 +68,31 @@ pub struct ServerGreetingFrame {
 
 impl ServerGreetingFrame {
   /// give a mode, generates a server greeting frame
-  pub fn with_mode(mode: Mode) -> Self {
-    Self {
-      unused: [0; 12],
-      mode,
-      challenge: [0; 16],
-      salt: [0; 16],
-      count: 1024,
-      mbz: [0; 12],
+  pub fn new(mode: Mode) -> Self {
+    match mode {
+      Mode::Authenticated => todo!(),
+      Mode::Encrypted => todo!(),
+      _ => Self {
+        unused: [0; 12],
+        mode,
+        challenge: [0; 16],
+        salt: [0; 16],
+        count: 1024,
+        mbz: [0; 12],
+      },
     }
   }
+}
 
-  /// Given the
-  pub fn get_reply(&self) -> SetupResponseFrame {
-    SetupResponseFrame::with_mode(self.mode)
+impl Reply<SetupResponseFrame> for ServerGreetingFrame {
+  /// Formulates the reply based on the mode
+  fn reply(&self) -> SetupResponseFrame {
+    match self.mode {
+      Mode::Unavailable => todo!(),
+      Mode::Unauthenticated => SetupResponseFrame::new(self.mode),
+      Mode::Authenticated => todo!(),
+      Mode::Encrypted => todo!(),
+    }
   }
 }
 

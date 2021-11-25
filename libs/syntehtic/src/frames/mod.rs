@@ -1,7 +1,9 @@
 //! The frame defines all the frames required for communicating.
+use eyre::Result;
 
 mod accept;
 mod accept_session;
+mod common;
 mod ipvn;
 mod mode;
 mod request_session;
@@ -13,12 +15,20 @@ mod start_session;
 mod stop_session;
 
 use crate::errors::SyntheticError;
-use eyre::Result;
 
 pub use self::{
-  accept::Accept, accept_session::AcceptSessionFrame, ipvn::IpVn, mode::Mode, request_session::RequestSessionFrame,
-  server_greeting::ServerGreetingFrame, server_start::ServerStartFrame, setup_response::SetupResponseFrame,
-  start_ack::StartAckFrame, start_session::StartSessionFrame, stop_session::StopSessionFrame,
+  accept::Accept,
+  accept_session::AcceptSessionFrame,
+  common::{Reply, SyncSendStatic},
+  ipvn::IpVn,
+  mode::Mode,
+  request_session::RequestSessionFrame,
+  server_greeting::ServerGreetingFrame,
+  server_start::ServerStartFrame,
+  setup_response::SetupResponseFrame,
+  start_ack::StartAckFrame,
+  start_session::StartSessionFrame,
+  stop_session::StopSessionFrame,
 };
 
 /// Protocol agnostic frame implementation. Represents all the possible information arrangements
@@ -42,9 +52,10 @@ pub enum SyntheticFrame {
   StopSession(StopSessionFrame), // 32 bytes
 }
 
-impl SyntheticFrame {
-  /// Tries to convert from a bytes array
-  pub fn try_from_bytes(bytes: Vec<u8>) -> Result<Self, SyntheticError> {
+impl TryFrom<Vec<u8>> for SyntheticFrame {
+  type Error = SyntheticError;
+
+  fn try_from(bytes: Vec<u8>) -> Result<Self, Self::Error> {
     let size = bytes.len();
     match size {
       ServerGreetingFrame::SIZE => Ok(Self::ServerGreeting(bytes.into())),

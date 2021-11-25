@@ -31,7 +31,7 @@ fn main() {
   // FIXME: Proper error handling and message in case of panic.
 }
 
-/// Sets up the environment and do necessary actions before starting up the action
+/// Sets up the environment and do necessary actions before starting up the program
 ///
 /// TODO: we need to add configuration setup. The plan to have one global config singleton object, and subsequent calls
 /// to them will reference that global object.

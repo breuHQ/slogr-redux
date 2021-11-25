@@ -51,8 +51,7 @@ impl Decoder for SyntheticFrameTCPCodec {
       return Ok(None);
     }
 
-    let frame = SyntheticFrame::try_from_bytes(payload);
-    match frame {
+    match SyntheticFrame::try_from(payload) {
       Ok(frame) => Ok(Some(frame)),
       Err(err) => Err(err),
     }

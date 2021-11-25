@@ -2,7 +2,6 @@
 
 use futures::{Future, SinkExt};
 use std::{net::SocketAddr, pin::Pin};
-use tokio::net::TcpStream;
 use tracing::info;
 
 use eyre::Result;
@@ -10,12 +9,16 @@ use tokio_stream::StreamExt;
 use tokio_util::codec::Decoder;
 
 use crate::{
-  codec::SyntheticFrameTCPCodec, errors::SyntheticError, frames::SyntheticFrame, io::connection::Connection,
+  codec::SyntheticFrameTCPCodec,
+  errors::SyntheticError,
+  frames::{Reply, SyncSendStatic, SyntheticFrame},
+  io::connection::Connection,
 };
 
 // ysf: reducing the cognitive load on the type
 type FramedStream = Result<SyntheticFrame, SyntheticError>;
 type TimedFramedStream = Result<Option<FramedStream>, tokio::time::error::Elapsed>;
+type PinnedFutureStream = Pin<Box<dyn Future<Output = TimedFramedStream>>>;
 
 /// Serves as a container for the client connection.
 #[derive(Debug)]
@@ -23,6 +26,8 @@ pub struct Client {
   /// Represents a tcp connection
   pub connection: Connection,
 }
+
+impl SyncSendStatic for Client {}
 
 impl Client {
   /// connect to a given address
@@ -47,12 +52,10 @@ impl Client {
     mut stream: tokio_util::codec::Framed<tokio::net::TcpStream, SyntheticFrameTCPCodec>,
   ) -> Result<(), SyntheticError> {
     match response {
-      Ok(response_frame) => {
+      Ok(resp) => {
         // ysf: this should be `response.reply(stream).await?`.
-        match response_frame {
-          SyntheticFrame::ServerGreeting(frame) => {
-            stream.send(SyntheticFrame::SetUpResponse(frame.get_reply())).await?
-          }
+        match resp {
+          SyntheticFrame::ServerGreeting(f) => stream.send(SyntheticFrame::SetUpResponse(f.reply())).await?,
           SyntheticFrame::SetUpResponse(_) => todo!(),
           SyntheticFrame::ServerStart(_) => todo!(),
           SyntheticFrame::RequestSession(_) => todo!(),
@@ -61,13 +64,6 @@ impl Client {
           SyntheticFrame::StartAck(_) => todo!(),
           SyntheticFrame::StopSession(_) => todo!(),
         }
-        // if let SyntheticFrame::ServerGreeting(greeting) = frame {
-        //   stream
-        //     .send(SyntheticFrame::SetUpResponse(greeting.generate_response()))
-        //     .await?
-        // } else {
-        //   return Err(SyntheticError::UnexpectedFrame);
-        // }
       }
       Err(err) => return Err(err),
     };

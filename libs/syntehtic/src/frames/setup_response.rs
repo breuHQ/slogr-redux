@@ -86,7 +86,7 @@ pub struct SetupResponseFrame {
 impl SetupResponseFrame {
   /// Given the [`ServerGreetingMode`], We generate the setup response.
   /// TODO: complete for all cases
-  pub fn with_mode(mode: Mode) -> Self {
+  pub fn new(mode: Mode) -> Self {
     match mode {
       Mode::Authenticated => todo!(),
       Mode::Unauthenticated => Self {

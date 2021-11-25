@@ -1,4 +1,4 @@
-//! Quickly generate `to_bytes()` and `from_bytes` methods on a struct to for easy data conversions.
+//! Macro to provide `from()` & `into()` implementations for a struct with either `enums` and positive integer field.
 //!
 //! We have made the following assumptions about the fields of the struct:
 //!
@@ -20,12 +20,11 @@
 //! and might prove handy. here is the discussion on the topic.
 //!
 //! https://github.com/illicitonion/num_enum/issues/61#issuecomment-955804109
-
-use crate::models::{ByteMeField, ByteMeStruct};
 mod models;
 mod utils;
+use crate::models::{ByteMeField, ByteMeStruct};
 
-/// Quickly generate `to_bytes()` and `from_bytes` methods on a struct to for easy data conversions.
+/// Macro to provide `from()` & `into()` implementations for a struct with either `enums` and positive integer field.
 #[proc_macro_derive(ByteMe, attributes(byte_me))]
 pub fn derive(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
   let strukt = syn::parse_macro_input!(tokens as ByteMeStruct);
@@ -71,14 +70,14 @@ pub fn derive(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
         let mut bytes = Vec::new();
         #(#fn_lines_to_bytes)*
         bytes
-     } 
+     }
     }
   };
 
   processed.into()
 }
 
-/// Creates a line for `to_bytes` function for a single field depending on the data_type
+/// Creates a line for `From<Struct> for Vec<u8>` function for a single field depending on the data_type
 fn to_bytes_fn_factory(field: &ByteMeField) -> proc_macro2::TokenStream {
   let name = &field.ident;
   let data_type = &field.data_type;
@@ -94,7 +93,7 @@ fn to_bytes_fn_factory(field: &ByteMeField) -> proc_macro2::TokenStream {
   }
 }
 
-/// Creates a line for `from_bytes` function for a single field depending on the data_type
+/// Creates a line for `From<Vec<u8>> for Struct` function for a single field depending on the data_type
 fn from_bytes_fn_factory(field: &ByteMeField, count: &core::cell::Cell<usize>) -> proc_macro2::TokenStream {
   let name = &field.ident;
   let size = &field.size;

@@ -46,17 +46,17 @@ impl Server {
     let mode = Mode::Unauthenticated;
     info!("Connection [NEW]: {:?}", connection.addr);
 
-    let mut framed = Framed::new(connection.stream, SyntheticFrameTCPCodec::new());
-    framed
-      .send(SyntheticFrame::ServerGreeting(ServerGreetingFrame::with_mode(mode)))
+    let mut framed_stream = Framed::new(connection.stream, SyntheticFrameTCPCodec::new());
+    framed_stream
+      .send(SyntheticFrame::ServerGreeting(ServerGreetingFrame::new(mode)))
       .await?;
 
     // _quick_concurrency_check(mode, &mut framed).await?;
 
-    while let Some(message) = framed.next().await {
-      match message {
-        Ok(bytes) => println!("frame: {:?}", bytes),
-        Err(err) => return Err(err),
+    while let Some(response) = framed_stream.next().await {
+      match response {
+        Ok(frame) => println!("frame: {:?}", frame),
+        Err(error) => return Err(error),
       }
     }
 
@@ -73,8 +73,8 @@ async fn _quick_concurrency_check(
 ) -> Result<(), SyntheticError> {
   let mut frames: Vec<SyntheticFrame> = Vec::new();
   for _ in 1..10000 {
-    frames.push(SyntheticFrame::ServerGreeting(ServerGreetingFrame::with_mode(mode)));
-    frames.push(SyntheticFrame::SetUpResponse(SetupResponseFrame::with_mode(mode)));
+    frames.push(SyntheticFrame::ServerGreeting(ServerGreetingFrame::new(mode)));
+    frames.push(SyntheticFrame::SetUpResponse(SetupResponseFrame::new(mode)));
   }
   for frame in frames {
     stream.send(frame).await?;
