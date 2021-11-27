@@ -1,7 +1,8 @@
-use crate::frames::Reply;
+use crate::common::{generate_random_sequence, IsValid, Reply};
 
 use super::{Mode, SetupResponseFrame};
 use byteme::ByteMe;
+use tracing::debug;
 
 ///   The server greeting frame required for connection handshake.
 ///
@@ -33,9 +34,6 @@ use byteme::ByteMe;
 ///   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 /// ```
 ///
-/// # Example
-/// ```
-/// ```
 /// Salt and Count are parameters used in deriving a key from a shared
 /// secret as described below.
 ///
@@ -70,9 +68,15 @@ impl ServerGreetingFrame {
   /// give a mode, generates a server greeting frame
   pub fn new(mode: Mode) -> Self {
     match mode {
-      Mode::Authenticated => todo!(),
-      Mode::Encrypted => todo!(),
-      _ => Self {
+      Mode::Authenticated | Mode::Encrypted => Self {
+        unused: [0; 12],
+        mode,
+        challenge: Self::generate_challenge(),
+        salt: Self::generate_salt(),
+        count: 1024,
+        mbz: [0; 12],
+      },
+      Mode::Unauthenticated | Mode::Unavailable => Self {
         unused: [0; 12],
         mode,
         challenge: [0; 16],
@@ -82,25 +86,92 @@ impl ServerGreetingFrame {
       },
     }
   }
+
+  /// generates the challenge
+  pub fn generate_challenge() -> [u8; 16] {
+    let challenge: [u8; 16] = generate_random_sequence(16).as_bytes().try_into().unwrap();
+    challenge
+  }
+
+  /// generates the salt
+  pub fn generate_salt() -> [u8; 16] {
+    let salt: [u8; 16] = generate_random_sequence(16).as_bytes().try_into().unwrap();
+    salt
+  }
 }
 
-impl Reply<SetupResponseFrame> for ServerGreetingFrame {
-  /// Formulates the reply based on the mode
-  fn reply(&self) -> SetupResponseFrame {
+impl Reply for ServerGreetingFrame {
+  type Response = SetupResponseFrame;
+
+  fn reply(&self) -> Self::Response {
+    debug!("Composing Reply for: {:?}", self);
     match self.mode {
-      Mode::Unavailable => todo!(),
-      Mode::Unauthenticated => SetupResponseFrame::new(self.mode),
+      Mode::Unauthenticated | Mode::Unavailable => SetupResponseFrame::new(self.mode),
       Mode::Authenticated => todo!(),
       Mode::Encrypted => todo!(),
     }
   }
 }
 
+impl IsValid for ServerGreetingFrame {
+  fn is_valid(&self) -> bool {
+    match self.mode {
+      Mode::Unavailable | Mode::Unauthenticated => {
+        self.unused == [0; 12]
+          && self.challenge == [0; 16]
+          && self.salt == [0; 16]
+          && self.count == 1024
+          && self.mbz == [0; 12]
+      }
+      Mode::Authenticated | Mode::Encrypted => {
+        self.unused == [0; 12]
+          && self.challenge != [0; 16]
+          && self.salt != [0; 16]
+          && self.count == 1024
+          && self.mbz == [0; 12]
+      }
+    }
+  }
+}
+
 #[cfg(test)]
 mod tests {
-  #[test]
-  fn test_into() {}
+  use super::{Mode, ServerGreetingFrame, SetupResponseFrame};
+  use crate::common::{IsValid, Reply};
 
   #[test]
-  fn test_from() {}
+  fn create_with_mode_unauthetnicated() {
+    let mode = Mode::Unauthenticated;
+    let frame: Vec<u8> = ServerGreetingFrame::new(mode).into();
+    let frame: ServerGreetingFrame = frame.into();
+    let is_valid = frame.is_valid();
+    assert!(is_valid);
+  }
+
+  #[test]
+  fn reply_with_mode_unauthenticated() {
+    let mode = Mode::Unauthenticated;
+    let response = SetupResponseFrame::new(mode);
+    let frame = ServerGreetingFrame::new(mode);
+    let reply = frame.reply();
+    assert_eq!(response, reply);
+  }
+
+  #[test]
+  fn create_with_mode_unavailable() {
+    let mode = Mode::Unavailable;
+    let frame: Vec<u8> = ServerGreetingFrame::new(mode).into();
+    let frame: ServerGreetingFrame = frame.into();
+    let is_valid = frame.is_valid();
+    assert!(is_valid);
+  }
+
+  #[test]
+  fn reply_with_mode_unavailable() {
+    let mode = Mode::Unavailable;
+    let response = SetupResponseFrame::new(mode);
+    let frame = ServerGreetingFrame::new(mode);
+    let reply = frame.reply();
+    assert_eq!(response, reply);
+  }
 }

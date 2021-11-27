@@ -14,7 +14,7 @@ use num_derive::FromPrimitive;
 /// SHOULD close the connection if it receives a greeting with Modes
 /// equal to zero.  The client MAY close the connection if the client's
 /// desired mode is unavailable.
-#[derive(Debug, Copy, Clone, FromPrimitive)]
+#[derive(Debug, Copy, Clone, FromPrimitive, PartialEq, Eq)]
 pub enum Mode {
   /// 0: The server is not willing to accept any more sessions.
   Unavailable = 0,

@@ -43,7 +43,7 @@ impl Server {
   /// handles the connection
   #[instrument]
   async fn handle(connection: Connection) -> Result<(), SyntheticError> {
-    let mode = Mode::Unauthenticated;
+    let mode = Mode::Authenticated;
     info!("Connection [NEW]: {:?}", connection.addr);
 
     let mut framed_stream = Framed::new(connection.stream, SyntheticFrameTCPCodec::new());

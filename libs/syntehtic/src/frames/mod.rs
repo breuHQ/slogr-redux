@@ -3,7 +3,6 @@ use eyre::Result;
 
 mod accept;
 mod accept_session;
-mod common;
 mod ipvn;
 mod mode;
 mod request_session;
@@ -17,18 +16,9 @@ mod stop_session;
 use crate::errors::SyntheticError;
 
 pub use self::{
-  accept::Accept,
-  accept_session::AcceptSessionFrame,
-  common::{Reply, SyncSendStatic},
-  ipvn::IpVn,
-  mode::Mode,
-  request_session::RequestSessionFrame,
-  server_greeting::ServerGreetingFrame,
-  server_start::ServerStartFrame,
-  setup_response::SetupResponseFrame,
-  start_ack::StartAckFrame,
-  start_session::StartSessionFrame,
-  stop_session::StopSessionFrame,
+  accept::Accept, accept_session::AcceptSessionFrame, ipvn::IpVn, mode::Mode, request_session::RequestSessionFrame,
+  server_greeting::ServerGreetingFrame, server_start::ServerStartFrame, setup_response::SetupResponseFrame,
+  start_ack::StartAckFrame, start_session::StartSessionFrame, stop_session::StopSessionFrame,
 };
 
 /// Protocol agnostic frame implementation. Represents all the possible information arrangements

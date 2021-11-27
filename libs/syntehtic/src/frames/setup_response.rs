@@ -29,7 +29,7 @@ use byteme::ByteMe;
 ///   |                                                               |
 ///   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 /// ```
-#[derive(Debug, Clone, Copy, ByteMe)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ByteMe)]
 pub struct SetupResponseFrame {
   /// Here Mode is the mode that the client chooses to use during this
   /// TWAMP-Control session.  It will also be used for all TWAMP-Test
@@ -89,13 +89,12 @@ impl SetupResponseFrame {
   pub fn new(mode: Mode) -> Self {
     match mode {
       Mode::Authenticated => todo!(),
-      Mode::Unauthenticated => Self {
+      Mode::Unauthenticated | Mode::Unavailable => Self {
         mode,
         key_id: [0; 80],
         token: [0; 64],
         client_iv: [0; 16],
       },
-      Mode::Unavailable => todo!(),
       Mode::Encrypted => todo!(),
     }
   }

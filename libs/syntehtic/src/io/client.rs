@@ -10,15 +10,16 @@ use tokio_util::codec::Decoder;
 
 use crate::{
   codec::SyntheticFrameTCPCodec,
+  common::{Reply, SendSyncStatic},
   errors::SyntheticError,
-  frames::{Reply, SyncSendStatic, SyntheticFrame},
+  frames::SyntheticFrame,
   io::connection::Connection,
 };
 
 // ysf: reducing the cognitive load on the type
-type FramedStream = Result<SyntheticFrame, SyntheticError>;
-type TimedFramedStream = Result<Option<FramedStream>, tokio::time::error::Elapsed>;
-type PinnedFutureStream = Pin<Box<dyn Future<Output = TimedFramedStream>>>;
+type SyntheticStreamResult = Result<SyntheticFrame, SyntheticError>;
+type SyntheticStreamResultWithTimeout = Result<Option<SyntheticStreamResult>, tokio::time::error::Elapsed>;
+type PinnedSyntheticStreamResultWithTimeout = Pin<Box<dyn Future<Output = SyntheticStreamResultWithTimeout>>>;
 
 /// Serves as a container for the client connection.
 #[derive(Debug)]
@@ -27,7 +28,7 @@ pub struct Client {
   pub connection: Connection,
 }
 
-impl SyncSendStatic for Client {}
+impl SendSyncStatic for Client {}
 
 impl Client {
   /// connect to a given address
@@ -38,7 +39,7 @@ impl Client {
     info!("Connected: {}", addr);
     let mut stream = SyntheticFrameTCPCodec::new().framed(stream);
     let stream_with_timeout = tokio::time::timeout(timeout_strategy, stream.next());
-    let pinned_stream: Pin<Box<dyn Future<Output = TimedFramedStream>>> = Box::pin(stream_with_timeout);
+    let pinned_stream: Pin<Box<dyn Future<Output = SyntheticStreamResultWithTimeout>>> = Box::pin(stream_with_timeout);
 
     if let Ok(Some(response)) = pinned_stream.await {
       Client::handle(response, stream).await?;
