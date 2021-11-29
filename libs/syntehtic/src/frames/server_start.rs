@@ -67,8 +67,8 @@ pub struct ServerStartFrame {
   /// The timpestamp is a 64-bit unsigned integer representing the number of
   /// seconds since the PRIME epoch (00:00:00 UTC, January 1, 1900). The first
   /// 32 bits represent the number of seconds since the PRIME epoch (00:00:00
-  /// UTC, January 1, 1900). The last 32 bits represent the fractions. See
-  /// more at https://en.wikipedia.org/wiki/Network_Time_Protocol
+  /// UTC, January 1, 1900). The last 32 bits represent the fractions. More
+  /// information on [wikipedia](https://en.wikipedia.org/wiki/Network_Time_Protocol).
   ///
   pub start_time: u64,
   /// same as [`mbz1`]

@@ -17,9 +17,8 @@
 //!
 //! The `num-derive` crate is required to generate the `FromPrimitive` trait for enums. Having said that, the same
 //! functionality can be achieved using `num-enum` crate. It provides furthur control over the enum data types,
-//! and might prove handy. here is the discussion on the topic.
-//!
-//! https://github.com/illicitonion/num_enum/issues/61#issuecomment-955804109
+//! and might prove handy. here is the [discussion](https://github.com/illicitonion/num_enum/issues/61#issuecomment-955804109)
+//! on the topic.
 mod models;
 mod utils;
 use crate::models::{ByteMeField, ByteMeStruct};
@@ -32,12 +31,11 @@ pub fn derive(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
   let fn_lines_to_bytes = strukt.fields.iter().clone().map(|field| to_bytes_fn_factory(field));
 
   let count = core::cell::Cell::new(0_usize);
-  let count_ = &count;
   let fn_line_from_bytes = strukt
     .fields
     .iter()
     .clone()
-    .map(|field| from_bytes_fn_factory(field, count_));
+    .map(|field| from_bytes_fn_factory(field, &count));
 
   let name = &strukt.ident;
   let size: usize = strukt.fields.clone().iter().clone().map(|field| field.size).sum();
@@ -145,6 +143,6 @@ fn from_bytes_fn_factory(field: &ByteMeField, count: &core::cell::Cell<usize>) -
 
 /// Given `ByteMeField`, returns a TokenStream with only name of the field
 fn get_field_name(field: &ByteMeField) -> proc_macro2::TokenStream {
-  let name = &field.ident;
+  let name = field.ident.clone();
   quote::quote! {#name,}
 }
