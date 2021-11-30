@@ -12,7 +12,7 @@ use crate::{
   macros::write_frame,
 };
 
-/// Codec for [SyntehticFrame]
+/// Codec for [`SyntheticFrame`]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
 pub struct SyntheticFrameTCPCodec(());
 
@@ -61,16 +61,16 @@ impl Decoder for SyntheticFrameTCPCodec {
 impl Encoder<SyntheticFrame> for SyntheticFrameTCPCodec {
   type Error = SyntheticError;
 
-  fn encode(&mut self, frame: SyntheticFrame, dst: &mut BytesMut) -> Result<(), Self::Error> {
+  fn encode(&mut self, frame: SyntheticFrame, destination: &mut BytesMut) -> Result<(), Self::Error> {
     match frame {
-      SyntheticFrame::ServerGreeting(frame) => write_frame!(frame, dst, ServerGreetingFrame::SIZE),
-      SyntheticFrame::SetUpResponse(frame) => write_frame!(frame, dst, SetupResponseFrame::SIZE),
-      SyntheticFrame::ServerStart(frame) => write_frame!(frame, dst, ServerStartFrame::SIZE),
-      SyntheticFrame::RequestSession(frame) => write_frame!(frame, dst, RequestSessionFrame::SIZE),
-      SyntheticFrame::AcceptSession(frame) => write_frame!(frame, dst, AcceptSessionFrame::SIZE),
-      SyntheticFrame::StartSession(frame) => write_frame!(frame, dst, StartSessionFrame::SIZE),
-      SyntheticFrame::StartAck(frame) => write_frame!(frame, dst, frames::StartAckFrame::SIZE),
-      SyntheticFrame::StopSession(frame) => write_frame!(frame, dst, frames::StopSessionFrame::SIZE),
+      SyntheticFrame::ServerGreeting(frame) => write_frame!(frame, destination, ServerGreetingFrame::SIZE),
+      SyntheticFrame::SetUpResponse(frame) => write_frame!(frame, destination, SetupResponseFrame::SIZE),
+      SyntheticFrame::ServerStart(frame) => write_frame!(frame, destination, ServerStartFrame::SIZE),
+      SyntheticFrame::RequestSession(frame) => write_frame!(frame, destination, RequestSessionFrame::SIZE),
+      SyntheticFrame::AcceptSession(frame) => write_frame!(frame, destination, AcceptSessionFrame::SIZE),
+      SyntheticFrame::StartSession(frame) => write_frame!(frame, destination, StartSessionFrame::SIZE),
+      SyntheticFrame::StartAck(frame) => write_frame!(frame, destination, frames::StartAckFrame::SIZE),
+      SyntheticFrame::StopSession(frame) => write_frame!(frame, destination, frames::StopSessionFrame::SIZE),
     }
   }
 }

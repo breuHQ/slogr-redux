@@ -50,6 +50,11 @@ pub struct SetupResponseFrame {
   /// string is shorter, it is padded with zero octets), that tells the
   /// server which shared secret the client wishes to use to authenticate
   /// or encrypt,
+  ///
+  /// TODO: each sentinel is to have it's unique key_id and is transported
+  ///       at run time. For SDK, each client will store its value locally.
+  ///       For server side, we need to investigate a secure key vault.
+  ///       Can `etcd` do?
   pub key_id: [u8; 80],
   /// while Token is the concatenation of a 16-octet challenge,
   /// a 16-octet AES Session-key used for encryption, and a 32-octet HMAC-
@@ -66,8 +71,9 @@ pub struct SetupResponseFrame {
   ///
   /// The shared secret is a passphrase; it MUST not contain newlines.  The
   /// secret key is derived from the passphrase using a password-based key
-  /// derivation function PBKDF2 (PKCS #5) RFC2898.  The PBKDF2 function
-  /// requires several parameters: the PRF is HMAC-SHA1 RFC2104; the salt
+  /// derivation function PBKDF2 (PKCS #5) [RFC2898](https://datatracker.ietf.org/doc/html/rfc2898).
+  /// The PBKDF2 function requires several parameters: the PRF is HMAC-SHA1
+  /// [RFC2104](https://datatracker.ietf.org/doc/html/rfc2104); the salt
   /// and count are as transmitted by the server.
   pub token: [u8; 64],
   /// AES Session-key, HMAC Session-key and Client-IV are generated
@@ -84,7 +90,7 @@ pub struct SetupResponseFrame {
 }
 
 impl SetupResponseFrame {
-  /// Given the [`ServerGreetingMode`], We generate the setup response.
+  /// Given the [`Mode`], We generate the setup response.
   /// TODO: complete for all cases
   pub fn new(mode: Mode) -> Self {
     match mode {
@@ -97,6 +103,11 @@ impl SetupResponseFrame {
       },
       Mode::Encrypted => todo!(),
     }
+  }
+
+  fn get_key_id() -> [u8; 80] {
+    // TODO: get this from a global variable
+    todo!()
   }
 }
 

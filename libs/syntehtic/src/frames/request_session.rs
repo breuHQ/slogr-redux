@@ -195,7 +195,7 @@ pub struct RequestSessionFrame {
   ///  Codepoint (DSCP) value of sent OWAMP-Test packets, as defined in
   ///  RFC2474.  If the first two bits of Type-P descriptor are 01, then
   ///  the subsequent 16 bits specify the requested PHB Identification Code
-  ///  (PHB ID), as defined in [RFC2836].
+  ///  (PHB ID), as defined in [RFC2836](https://datatracker.ietf.org/doc/html/rfc2836).
   ///
   ///  Therefore, the value of all zeros specifies the default best-effort
   ///  service.

@@ -71,7 +71,7 @@ pub struct ServerStartFrame {
   /// information on [wikipedia](https://en.wikipedia.org/wiki/Network_Time_Protocol).
   ///
   pub start_time: u64,
-  /// same as [`mbz1`]
+  /// same as [`Self::mbz_1`]
   pub mbz_2: [u8; 8],
 }
 

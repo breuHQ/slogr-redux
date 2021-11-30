@@ -1,5 +1,6 @@
-//! Common traits and utilites
+//! Common utilities
 
+pub const KEY_ID: &str = "EIKDY9tK0E5G61GsnSgGjm4gB4FJ9lvpklkI538QgmHEudQQJEMwMU8qvxX1X2O4JXypv4zVCAg8HsJE";
 /// Trait to Implement `reply()` method
 pub trait Reply {
   /// type of Response
@@ -17,7 +18,8 @@ pub trait IsValid {
 /// Quickly implement a life time for a struct intended to be shared between threads.
 pub trait SendSyncStatic: Send + Sync + 'static {}
 
-/// Generate a random sequence of characters given the length
+/// Generate a random sequence of characters given the length. Under the hood, it uses `thread_rng` which is crypto
+/// secure as per the [documentation](https://docs.rs/rand/0.8.4/rand/rngs/struct.ThreadRng.html)
 pub fn generate_random_sequence(len: usize) -> String {
   use rand::distributions::Alphanumeric;
   use rand::{thread_rng, Rng};
