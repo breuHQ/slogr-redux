@@ -1,5 +1,7 @@
 //! Common utilities
 
+/// Both server and client needs to know the key_iv, secret map to encrypt/decypt data
+/// TODO: this is to make progress, come up with a logic to share keys securely
 pub const KEY_ID: &str = "EIKDY9tK0E5G61GsnSgGjm4gB4FJ9lvpklkI538QgmHEudQQJEMwMU8qvxX1X2O4JXypv4zVCAg8HsJE";
 /// Trait to Implement `reply()` method
 pub trait Reply {
