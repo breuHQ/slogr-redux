@@ -1,12 +1,8 @@
 [workspace]
-members = [
-    "pkgs/*",
-    "libs/*",
-    "macros/*"
-]
+members = ["pkgs/*", "libs/*"]
 
 [profile.release]
 debug = 0
 codegen-units = 1
 lto = true
-opt-level = 'z'  # Optimize for size.
+opt-level = 'z'   # Optimize for size.
