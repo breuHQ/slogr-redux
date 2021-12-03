@@ -33,17 +33,10 @@ impl SendSyncStatic for Client {}
 impl Client {
   /// connect to a given address
   pub async fn connect() -> Result<(), SyntheticError> {
-    // let timeout_strategy = tokio::time::Duration::from_secs(120);
     let addr = "127.0.0.1:9000".parse::<SocketAddr>().unwrap();
     let stream = tokio::net::TcpStream::connect(addr).await?;
     info!("Connected: {}", addr);
     let mut stream = SyntheticFrameTCPCodec::new().framed(stream);
-    // let stream_with_timeout = tokio::time::timeout(timeout_strategy, stream.next());
-    // let pinned_stream: Pin<Box<dyn Future<Output = SyntheticStreamResultWithTimeout>>> = Box::pin(stream_with_timeout);
-
-    // if let Ok(Some(response)) = pinned_stream.await {
-    //   Client::handle(response, stream).await?;
-    // }
 
     while let Some(response) = stream.next().await {
       match response {

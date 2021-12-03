@@ -1,5 +1,5 @@
-use super::Mode;
 use byteme::ByteMe;
+use common::Mode;
 
 /// The client MUST respond with the following Set-Up-Response message to
 /// Server-Greeting message.:

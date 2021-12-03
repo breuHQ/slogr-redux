@@ -10,16 +10,21 @@ edition = "2021"
 byteme = "0.0.4"
 bytes = "1.1.0"
 chrono = "0.4.19"
+common = { path = "../common" }
 eyre = "0.6.5"
 futures = "0.3.18"
 num-derive = "0.3.3"
 num-traits = "0.2.14"
-rand = "0.8.4"
+rand = { version = "0.8.4", features = ["getrandom"] }
 thiserror = "1.0.30"
-tokio = { version = "1.14.0", features = ["full"] }
+tokio = { version = "1.14.0", features = [
+  "rt-multi-thread",
+  "net",
+  "sync",
+  "io-util",
+] }
 tokio-stream = "0.1.8"
-tokio-util = { version = "0.6.9", features = ["full"] }
+tokio-util = { version = "0.6.9", features = ["codec"] }
 tracing = { version = "0.1.29", default-features = false, features = [
   "attributes",
 ] }
-tracing-subscriber = "0.3.3"

@@ -1,7 +1,8 @@
 use crate::common::{generate_random_sequence, IsValid, Reply};
 
-use super::{Mode, SetupResponseFrame};
+use super::SetupResponseFrame;
 use byteme::ByteMe;
+use common::Mode;
 use tracing::debug;
 
 ///   The server greeting frame required for connection handshake.

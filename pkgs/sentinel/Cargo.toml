@@ -8,23 +8,15 @@ default-run = "sentinel"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+synthetic = { path = "../../libs/syntehtic" }
 clap = { version = "2.34.0", features = ["yaml"] }
-tokio = { version = "1.14.0", features = ["full"] }
-tokio-stream = "0.1.8"
-tokio-util = { version = "0.6.9", features = ["full"] }
+tokio = { version = "1.14.0", features = ["rt-multi-thread"] }
 tracing = { version = "0.1.29", default-features = false, features = [
   "attributes",
   "max_level_debug",
   "release_max_level_info",
 ] }
 tracing-subscriber = "0.3.3"
+
+[dev-dependencies]
 criterion = "0.3.5"
-
-# sentinel related dependencies
-synthetic = { path = "../../libs/syntehtic" }
-
-
-[[bench]]
-name = "benchmark"
-path = "src/benchmark.rs"
-harness = false

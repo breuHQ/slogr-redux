@@ -2,10 +2,9 @@
 
 use std::net::SocketAddr;
 
+use common::Mode;
 use tokio::{io::BufWriter, net::TcpStream};
 use tracing::instrument;
-
-use crate::frames::Mode;
 
 /// Represents a connection to the underlying stream.
 /// Depending on the role of the connection i.e. the server, control client, session sender or session reflector, we

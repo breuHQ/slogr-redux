@@ -1,6 +1,7 @@
 //! When our agent is serving as a server, we need to be able to send messages to the client.
+use common::Mode;
 use futures::sink::SinkExt;
-use std::net::SocketAddr;
+// use std::net::SocketAddr;
 
 use eyre::Result;
 use tokio::net::TcpListener;
@@ -11,15 +12,15 @@ use tracing::{info, instrument};
 use crate::{
   codec::SyntheticFrameTCPCodec,
   errors::SyntheticError,
-  frames::{Mode, ServerGreetingFrame, SetupResponseFrame, SyntheticFrame},
+  frames::{ServerGreetingFrame, SetupResponseFrame, SyntheticFrame},
   io::connection::Connection,
 };
 
 /// Defines the server as per the RFC definition.
 #[derive(Debug)]
 pub struct Server {
-  addr: SocketAddr,
-  listener: TcpListener,
+  // addr: SocketAddr,
+// listener: TcpListener,
 }
 
 /// Represents a single connection to the server.
@@ -27,8 +28,6 @@ impl Server {
   /// Starts a new server.
   #[instrument]
   pub async fn run() -> Result<TcpListener, SyntheticError> {
-    let now = chrono::Utc::now().timestamp_nanos();
-    info!("Server [Timestamp]: {}", now);
     let listener = TcpListener::bind("0.0.0.0:9000").await?;
     // .expect(msg!("Failed to bind to port 9000"));
     info!("Server [LISTENING]: {:?}", listener.local_addr().unwrap());
@@ -43,7 +42,7 @@ impl Server {
   /// handles the connection
   #[instrument]
   async fn handle(connection: Connection) -> Result<(), SyntheticError> {
-    let mode = Mode::Authenticated;
+    let mode = Mode::Unauthenticated;
     info!("Connection [NEW]: {:?}", connection.addr);
 
     let mut framed_stream = Framed::new(connection.stream, SyntheticFrameTCPCodec::new());

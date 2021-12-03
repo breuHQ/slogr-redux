@@ -4,7 +4,6 @@ use eyre::Result;
 mod accept;
 mod accept_session;
 mod ipvn;
-mod mode;
 mod request_session;
 mod server_greeting;
 mod server_start;
@@ -16,7 +15,7 @@ mod stop_session;
 use crate::errors::SyntheticError;
 
 pub use self::{
-  accept::Accept, accept_session::AcceptSessionFrame, ipvn::IpVn, mode::Mode, request_session::RequestSessionFrame,
+  accept::Accept, accept_session::AcceptSessionFrame, ipvn::IpVn, request_session::RequestSessionFrame,
   server_greeting::ServerGreetingFrame, server_start::ServerStartFrame, setup_response::SetupResponseFrame,
   start_ack::StartAckFrame, start_session::StartSessionFrame, stop_session::StopSessionFrame,
 };
