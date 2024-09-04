@@ -20,9 +20,17 @@ pub enum SyntheticError {
     available_modes: Vec<String>,
   },
 
+  /// An Unexpectd frame
+  #[error("Unexpected frame")]
+  UnexpectedFrame,
+
   /// Error while trying to convert bytes to frame
   #[error("Invalid or empty frame")]
   IllegalFrame,
+
+  /// Connection was closed due to timeout
+  #[error("Connection timeout")]
+  ConnectionTimeout,
 
   /// transparently communicating back errors
   #[error(transparent)]

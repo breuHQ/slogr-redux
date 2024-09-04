@@ -1,7 +1,8 @@
-use super::Mode;
 use byteme::ByteMe;
+use common::Mode;
 
-/// The client MUST respond with the following Set-Up-Response message:
+/// The client MUST respond with the following Set-Up-Response message to
+/// Server-Greeting message.:
 ///
 /// ```text
 ///    0                   1                   2                   3
@@ -28,7 +29,7 @@ use byteme::ByteMe;
 ///   |                                                               |
 ///   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 /// ```
-#[derive(Debug, Clone, Copy, ByteMe)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ByteMe)]
 pub struct SetupResponseFrame {
   /// Here Mode is the mode that the client chooses to use during this
   /// TWAMP-Control session.  It will also be used for all TWAMP-Test
@@ -49,6 +50,11 @@ pub struct SetupResponseFrame {
   /// string is shorter, it is padded with zero octets), that tells the
   /// server which shared secret the client wishes to use to authenticate
   /// or encrypt,
+  ///
+  /// TODO: each sentinel is to have it's unique key_id and is transported
+  ///       at run time. For SDK, each client will store its value locally.
+  ///       For server side, we need to investigate a secure key vault.
+  ///       Can `etcd` do?
   pub key_id: [u8; 80],
   /// while Token is the concatenation of a 16-octet challenge,
   /// a 16-octet AES Session-key used for encryption, and a 32-octet HMAC-
@@ -65,8 +71,9 @@ pub struct SetupResponseFrame {
   ///
   /// The shared secret is a passphrase; it MUST not contain newlines.  The
   /// secret key is derived from the passphrase using a password-based key
-  /// derivation function PBKDF2 (PKCS #5) RFC2898.  The PBKDF2 function
-  /// requires several parameters: the PRF is HMAC-SHA1 RFC2104; the salt
+  /// derivation function PBKDF2 (PKCS #5) [RFC2898](https://datatracker.ietf.org/doc/html/rfc2898).
+  /// The PBKDF2 function requires several parameters: the PRF is HMAC-SHA1
+  /// [RFC2104](https://datatracker.ietf.org/doc/html/rfc2104); the salt
   /// and count are as transmitted by the server.
   pub token: [u8; 64],
   /// AES Session-key, HMAC Session-key and Client-IV are generated
@@ -83,19 +90,32 @@ pub struct SetupResponseFrame {
 }
 
 impl SetupResponseFrame {
-  /// Given the [`ServerGreetingMode`], We generate the setup response.
+  /// Given the [`Mode`], We generate the setup response.
   /// TODO: complete for all cases
-  pub fn with_mode(mode: Mode) -> Self {
+  pub fn new(mode: Mode) -> Self {
     match mode {
       Mode::Authenticated => todo!(),
-      Mode::Unauthenticated => Self {
+      Mode::Unauthenticated | Mode::Unavailable => Self {
         mode,
         key_id: [0; 80],
         token: [0; 64],
         client_iv: [0; 16],
       },
-      Mode::Unavailable => todo!(),
       Mode::Encrypted => todo!(),
     }
   }
+
+  fn get_key_id() -> [u8; 80] {
+    // TODO: get this from a global variable
+    todo!()
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  #[test]
+  fn test_into() {}
+
+  #[test]
+  fn test_from() {}
 }

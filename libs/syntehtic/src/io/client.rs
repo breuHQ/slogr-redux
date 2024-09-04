@@ -1,13 +1,25 @@
 //! Client side of the synthetic I/O.
 
+use futures::SinkExt;
 use std::net::SocketAddr;
+use tracing::info;
 
-use tokio::net::TcpStream;
+use eyre::Result;
 use tokio_stream::StreamExt;
 use tokio_util::codec::Decoder;
-use tracing::debug;
 
-use crate::{errors::SyntheticError, frames::SyntheticFrameCodec, io::connection::Connection};
+use crate::{
+  codec::SyntheticFrameTCPCodec,
+  common::{Reply, SendSyncStatic},
+  errors::SyntheticError,
+  frames::SyntheticFrame,
+  io::connection::Connection,
+};
+
+// ysf: reducing the cognitive load on the type
+// type SyntheticStreamResult = Result<SyntheticFrame, SyntheticError>;
+// type SyntheticStreamResultWithTimeout = Result<Option<SyntheticStreamResult>, tokio::time::error::Elapsed>;
+// type PinnedSyntheticStreamResultWithTimeout = Pin<Box<dyn Future<Output = SyntheticStreamResultWithTimeout>>>;
 
 /// Serves as a container for the client connection.
 #[derive(Debug)]
@@ -16,19 +28,35 @@ pub struct Client {
   pub connection: Connection,
 }
 
+impl SendSyncStatic for Client {}
+
 impl Client {
   /// connect to a given address
   pub async fn connect() -> Result<(), SyntheticError> {
     let addr = "127.0.0.1:9000".parse::<SocketAddr>().unwrap();
-    let stream = TcpStream::connect(addr).await?;
-    let mut framed = SyntheticFrameCodec::new().framed(stream);
+    let stream = tokio::net::TcpStream::connect(addr).await?;
+    info!("Connected: {}", addr);
+    let mut stream = SyntheticFrameTCPCodec::new().framed(stream);
 
-    while let Some(frame) = framed.next().await {
-      match frame {
-        Ok(f) => debug!("Recieved Frame: {:?}", f),
-        Err(err) => Err(err)?,
-      }
-    };
+    while let Some(response) = stream.next().await {
+      match response {
+        Ok(resp) => {
+          // ysf: this should be `response.reply(stream).await?`.
+          match resp {
+            SyntheticFrame::ServerGreeting(f) => stream.send(SyntheticFrame::SetUpResponse(f.reply())).await?,
+            SyntheticFrame::SetUpResponse(_) => todo!(),
+            SyntheticFrame::ServerStart(_) => todo!(),
+            SyntheticFrame::RequestSession(_) => todo!(),
+            SyntheticFrame::AcceptSession(_) => todo!(),
+            SyntheticFrame::StartSession(_) => todo!(),
+            SyntheticFrame::StartAck(_) => todo!(),
+            SyntheticFrame::StopSession(_) => todo!(),
+          }
+        }
+        Err(err) => return Err(err),
+      };
+    }
+
     Ok(())
   }
 }

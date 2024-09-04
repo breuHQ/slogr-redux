@@ -2,10 +2,9 @@
 
 use std::net::SocketAddr;
 
+use common::Mode;
 use tokio::{io::BufWriter, net::TcpStream};
-use tracing::info;
-
-use crate::frames::Mode;
+use tracing::instrument;
 
 /// Represents a connection to the underlying stream.
 /// Depending on the role of the connection i.e. the server, control client, session sender or session reflector, we
@@ -22,11 +21,16 @@ pub struct Connection {
 
 impl Connection {
   /// creates a new connection object
+  #[instrument]
   pub fn new(stream: TcpStream, addr: SocketAddr) -> Self {
-    info!("Established connection for: {:?}", addr);
     let stream = BufWriter::new(stream);
     let mode = Mode::Unauthenticated; // TODO: Get this from global configuration.
 
     Self { stream, addr, mode }
+  }
+
+  /// upgrade the stream to
+  pub fn upgrade(&self) -> Self {
+    todo!()
   }
 }

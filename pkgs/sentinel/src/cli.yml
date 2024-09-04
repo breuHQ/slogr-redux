@@ -5,6 +5,16 @@ args:
       long: verbose
       short: v
       multiple: true
+  - mode:
+      help: Sets the mode of the sentinel
+      long: mode
+      short: m
+      possible_values:
+        - unavailable
+        - unauthenticated
+        - authenticated
+        - encrypted
+      default_value: unauthenticated
 
 subcommands:
   - config:
@@ -64,16 +74,16 @@ subcommands:
             long: id
             short: i
   - serve:
-      about: Starts the sentinel as a server
+      about: Starts the sentinel as
       args:
-        - mode:
-            help: Mode to run in
-            long: mode
-            short: m
+        - full:
+            help: Serve the sentinel in full mode, [y]es for full, [n]o for standalone
+            long: full
+            short: f
             possible_values:
-              - standalone # quick run without mothership
-              - full  # with all the bells and whistles
-            default_value: standalone
+              - n # quick run without mothership
+              - y # with all the bells and whistles
+            default_value: n
   - client:
       about: Create a new test client and runs in standalone mode
       subcommands:

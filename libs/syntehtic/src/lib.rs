@@ -115,9 +115,18 @@
 //! payload of a single ATM cell (this is only achieved in unauthenticated mode).
 
 #[warn(missing_debug_implementations, missing_docs)]
+pub mod codec;
+#[warn(missing_debug_implementations, missing_docs)]
+pub mod common;
+#[warn(missing_debug_implementations, missing_docs)]
 pub mod errors;
 #[warn(missing_debug_implementations, missing_docs)]
 pub mod frames;
-
 #[warn(missing_debug_implementations, missing_docs)]
 pub mod io;
+#[warn(missing_debug_implementations, missing_docs)]
+pub mod macros;
+#[warn(missing_docs, missing_debug_implementations)]
+pub mod minions;
+#[warn(missing_debug_implementations, missing_docs)]
+pub mod ntp;
